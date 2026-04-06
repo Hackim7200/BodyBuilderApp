@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        /* Custom hide spin buttons for inputs */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-tertiary-container": "#ffffff",
+                        "on-secondary-fixed": "#1b1c1c",
+                        "on-primary-container": "#ffffff",
+                        "background": "#f9f9f9",
+                        "tertiary-container": "#737575",
+                        "outline-variant": "#c6c6c6",
+                        "error-container": "#ffdad6",
+                        "on-background": "#1a1c1c",
+                        "tertiary": "#3a3c3c",
+                        "surface-container-low": "#f3f3f3",
+                        "on-secondary-container": "#1b1c1c",
+                        "surface-tint": "#5e5e5e",
+                        "primary": "#000000",
+                        "secondary": "#5e5e5e",
+                        "surface": "#f9f9f9",
+                        "on-secondary": "#ffffff",
+                        "on-surface": "#1a1c1c",
+                        "on-error-container": "#410002",
+                        "on-tertiary-fixed": "#ffffff",
+                        "secondary-fixed": "#c7c6c6",
+                        "on-primary-fixed": "#ffffff",
+                        "tertiary-fixed": "#5d5f5f",
+                        "inverse-primary": "#c6c6c6",
+                        "outline": "#777777",
+                        "secondary-container": "#d5d4d4",
+                        "surface-container": "#eeeeee",
+                        "on-primary": "#e2e2e2",
+                        "on-secondary-fixed-variant": "#3b3b3c",
+                        "on-surface-variant": "#474747",
+                        "surface-container-highest": "#e2e2e2",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed-dim": "#acabab",
+                        "on-tertiary-fixed-variant": "#e2e2e2",
+                        "on-tertiary": "#e2e2e2",
+                        "error": "#ba1a1a",
+                        "primary-fixed-dim": "#474747",
+                        "surface-variant": "#e2e2e2",
+                        "on-error": "#ffffff",
+                        "primary-container": "#3b3b3b",
+                        "surface-container-high": "#e8e8e8",
+                        "surface-dim": "#dadada",
+                        "inverse-surface": "#2f3131",
+                        "tertiary-fixed-dim": "#454747",
+                        "on-primary-fixed-variant": "#e2e2e2",
+                        "inverse-on-surface": "#f1f1f1",
+                        "surface-bright": "#f9f9f9",
+                        "primary-fixed": "#5e5e5e",
+                        "success": "#2e7d32"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body antialiased pb-24">
+<!-- Top Navigation Anchor -->
+<header class="fixed top-0 w-full z-50 bg-neutral-50/80 dark:bg-neutral-900/80 backdrop-blur-md">
+<div class="flex items-center justify-between px-6 h-16 w-full max-w-7xl mx-auto">
+<button class="flex items-center justify-center p-2 hover:opacity-70 transition-opacity scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-black dark:text-white" data-icon="menu">menu</span>
+</button>
+<h1 class="font-['Inter'] font-extrabold tracking-tighter uppercase text-xl text-black dark:text-white">KINETIC</h1>
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center overflow-hidden">
+<img alt="User profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_K8U1nuv3jfAPVWjG30_sI1gWMEZfH6AjHVGUvbU4XJ9etl8Xp-RRXbUBvmdB9cIVAeh8Cfy_gqQZrYTkBvbwmGAOam69laTM-2yU7bt-JUUCchAdqk-9M8TsNwrl-FGjdlojKKT5BtyVEwUzvE1VurmAod-ws9jh9U-oky42j9rUlUewDImP1E-foy5UU2_n3gW0SRJJ9OZi1MwMkCOm5z6kA-qo0ihtSJaE7nk6MlKjFOR3igUchwhBM2GXRAnPUmKgBzKwZRWF"/>
+</div>
+</div>
+</header>
+<main class="pt-24 px-6 max-w-2xl mx-auto pb-12">
+<!-- Editorial Header -->
+<section class="mb-10">
+<span class="font-label text-[10px] font-semibold uppercase tracking-widest text-tertiary mb-2 block">Current Session</span>
+<h2 class="font-headline font-extrabold text-5xl tracking-tighter uppercase leading-none">BENCH PRESS</h2>
+</section>
+<!-- Session Log Section -->
+<section class="mb-10 bg-surface-container-lowest border border-outline-variant/30 rounded-sm overflow-hidden">
+<div class="px-6 py-4 border-b border-outline-variant/30 flex justify-between items-center bg-surface-container-low">
+<h3 class="font-headline font-bold text-xs uppercase tracking-widest">Session Log</h3>
+<span class="font-label text-[10px] font-bold text-tertiary uppercase">Working Sets</span>
+</div>
+<div class="w-full">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-outline-variant/20">
+<th class="px-6 py-3 font-label text-[9px] font-bold uppercase tracking-widest text-tertiary">Set</th>
+<th class="px-6 py-3 font-label text-[9px] font-bold uppercase tracking-widest text-tertiary">Weight (kg)</th>
+<th class="px-6 py-3 font-label text-[9px] font-bold uppercase tracking-widest text-tertiary">Reps</th>
+<th class="px-6 py-3"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<tr class="group hover:bg-surface-container-low/50 transition-colors">
+<td class="px-6 py-4 font-headline font-extrabold text-lg">01</td>
+<td class="px-6 py-4">
+<input class="w-16 bg-transparent border-none p-0 font-headline font-bold text-lg focus:ring-0 focus:outline-none" type="number" value="100"/>
+</td>
+<td class="px-6 py-4">
+<input class="w-12 bg-transparent border-none p-0 font-headline font-bold text-lg focus:ring-0 focus:outline-none" type="number" value="8"/>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-tertiary hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">check_circle</span>
+</button>
+</td>
+</tr>
+<tr class="group hover:bg-surface-container-low/50 transition-colors">
+<td class="px-6 py-4 font-headline font-extrabold text-lg">02</td>
+<td class="px-6 py-4">
+<input class="w-16 bg-transparent border-none p-0 font-headline font-bold text-lg focus:ring-0 focus:outline-none" placeholder="--" type="number"/>
+</td>
+<td class="px-6 py-4">
+<input class="w-12 bg-transparent border-none p-0 font-headline font-bold text-lg focus:ring-0 focus:outline-none" placeholder="--" type="number"/>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-outline-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">radio_button_unchecked</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+<button class="w-full py-4 px-6 flex items-center justify-center gap-2 hover:bg-surface-container-low transition-colors border-t border-outline-variant/20">
+<span class="material-symbols-outlined text-sm">add</span>
+<span class="font-label text-[10px] font-bold uppercase tracking-widest">Add Set</span>
+</button>
+</div>
+</section>
+<!-- Bento Grid Section -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Strength Archive Chart -->
+<div class="col-span-12 bg-surface-container p-8 rounded-sm">
+<div class="flex justify-between items-start mb-10">
+<div>
+<h3 class="font-headline font-bold text-xs uppercase tracking-widest">Performance Archive</h3>
+<p class="text-[10px] text-tertiary uppercase mt-1">Est. 1RM progression</p>
+</div>
+<div class="text-right">
+<span class="font-headline font-extrabold text-2xl tracking-tight">112.5 <span class="text-[10px] font-medium text-tertiary tracking-normal uppercase">kg</span></span>
+</div>
+</div>
+<!-- SVG Line Chart Mock -->
+<div class="w-full h-32 relative">
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 400 100">
+<path d="M0 80 L80 75 L160 85 L240 60 L320 45 L400 30" fill="none" stroke="black" stroke-linecap="square" stroke-width="3"></path>
+<circle cx="0" cy="80" fill="black" r="3"></circle>
+<circle cx="80" cy="75" fill="black" r="3"></circle>
+<circle cx="160" cy="85" fill="black" r="3"></circle>
+<circle cx="240" cy="60" fill="black" r="3"></circle>
+<circle cx="320" cy="45" fill="black" r="3"></circle>
+<circle cx="400" cy="30" fill="black" r="4"></circle>
+</svg>
+<div class="flex justify-between mt-4 border-t border-outline-variant/10 pt-2">
+<span class="font-label text-[8px] font-bold text-tertiary">WK 01</span>
+<span class="font-label text-[8px] font-bold text-tertiary">WK 02</span>
+<span class="font-label text-[8px] font-bold text-tertiary">WK 03</span>
+<span class="font-label text-[8px] font-bold text-tertiary">WK 04</span>
+<span class="font-label text-[8px] font-bold text-tertiary">WK 05</span>
+<span class="font-label text-[8px] font-bold text-primary">CURRENT</span>
+</div>
+</div>
+</div>
+<!-- Historical Data Context -->
+<div class="col-span-6 bg-surface-container-low p-6 rounded-sm">
+<label class="font-label text-[9px] font-bold uppercase tracking-widest text-tertiary mb-3 block">1-Rep Max</label>
+<div class="font-headline font-extrabold text-3xl tracking-tighter">125 <span class="text-sm">KG</span></div>
+<div class="text-[9px] uppercase font-bold text-tertiary mt-2">Estimated Peak</div>
+</div>
+<div class="col-span-6 bg-surface-container-low p-6 rounded-sm">
+<label class="font-label text-[9px] font-bold uppercase tracking-widest text-tertiary mb-3 block">Percentage Increase</label>
+<div class="flex items-center gap-2">
+<div class="font-headline font-extrabold text-3xl tracking-tighter">+5.2%</div>
+<span class="material-symbols-outlined text-success text-xl">trending_up</span>
+</div>
+<div class="text-[9px] uppercase font-bold text-tertiary mt-2">Since Last Month</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 pb-safe bg-neutral-50/80 dark:bg-neutral-900/80 backdrop-blur-md z-50 border-t border-neutral-200/20 dark:border-neutral-800/20">
+<button class="flex flex-col items-center justify-center text-black dark:text-white bg-neutral-200 dark:bg-neutral-800 rounded-lg px-4 py-1 scale-98 active:scale-95 transition-transform hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
+<span class="material-symbols-outlined mb-1">fitness_center</span>
+<span class="font-['Inter'] font-semibold uppercase tracking-[0.1em] text-[10px]">Workouts</span>
+</button>
+<button class="flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-600 px-4 py-1 scale-98 active:scale-95 transition-transform hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
+<span class="material-symbols-outlined mb-1">reorder</span>
+<span class="font-['Inter'] font-semibold uppercase tracking-[0.1em] text-[10px]">Circuits</span>
+</button>
+<button class="flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-600 px-4 py-1 scale-98 active:scale-95 transition-transform hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
+<span class="material-symbols-outlined mb-1">self_improvement</span>
+<span class="font-['Inter'] font-semibold uppercase tracking-[0.1em] text-[10px]">Stretch</span>
+</button>
+</nav>
+</body></html>

@@ -1,0 +1,15 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-bodybuildingapp-dev-8a952-authRole",
+      "UnauthRoleArn": "arn:aws:iam::759135634975:role/amplify-bodybuildingapp-dev-8a952-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::759135634975:role/amplify-bodybuildingapp-dev-8a952-authRole",
+      "Region": "eu-west-2",
+      "DeploymentBucketName": "amplify-bodybuildingapp-dev-8a952-deployment",
+      "UnauthRoleName": "amplify-bodybuildingapp-dev-8a952-unauthRole",
+      "StackName": "amplify-bodybuildingapp-dev-8a952",
+      "StackId": "arn:aws:cloudformation:eu-west-2:759135634975:stack/amplify-bodybuildingapp-dev-8a952/5e89a0f0-3162-11f1-bac8-0a0fa3113b7f",
+      "AmplifyAppId": "d3h6ju130sdlp0"
+    }
+  }
+}

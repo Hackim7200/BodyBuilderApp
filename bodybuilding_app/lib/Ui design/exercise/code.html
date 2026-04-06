@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-tertiary-container": "#ffffff",
+                        "on-secondary-fixed": "#1b1c1c",
+                        "on-primary-container": "#ffffff",
+                        "background": "#f9f9f9",
+                        "tertiary-container": "#737575",
+                        "outline-variant": "#c6c6c6",
+                        "error-container": "#ffdad6",
+                        "on-background": "#1a1c1c",
+                        "tertiary": "#3a3c3c",
+                        "surface-container-low": "#f3f3f3",
+                        "on-secondary-container": "#1b1c1c",
+                        "surface-tint": "#5e5e5e",
+                        "primary": "#000000",
+                        "secondary": "#5e5e5e",
+                        "surface": "#f9f9f9",
+                        "on-secondary": "#ffffff",
+                        "on-surface": "#1a1c1c",
+                        "on-error-container": "#410002",
+                        "on-tertiary-fixed": "#ffffff",
+                        "secondary-fixed": "#c7c6c6",
+                        "on-primary-fixed": "#ffffff",
+                        "tertiary-fixed": "#5d5f5f",
+                        "inverse-primary": "#c6c6c6",
+                        "outline": "#777777",
+                        "secondary-container": "#d5d4d4",
+                        "surface-container": "#eeeeee",
+                        "on-primary": "#e2e2e2",
+                        "on-secondary-fixed-variant": "#3b3b3c",
+                        "on-surface-variant": "#474747",
+                        "surface-container-highest": "#e2e2e2",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed-dim": "#acabab",
+                        "on-tertiary-fixed-variant": "#e2e2e2",
+                        "on-tertiary": "#e2e2e2",
+                        "error": "#ba1a1a",
+                        "primary-fixed-dim": "#474747",
+                        "surface-variant": "#e2e2e2",
+                        "on-error": "#ffffff",
+                        "primary-container": "#3b3b3b",
+                        "surface-container-high": "#e8e8e8",
+                        "surface-dim": "#dadada",
+                        "inverse-surface": "#2f3131",
+                        "tertiary-fixed-dim": "#454747",
+                        "on-primary-fixed-variant": "#e2e2e2",
+                        "inverse-on-surface": "#f1f1f1",
+                        "surface-bright": "#f9f9f9",
+                        "primary-fixed": "#5e5e5e"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .kinetic-archive-header {
+            letter-spacing: -0.04em;
+        }
+    </style>
+<style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary selection:text-on-primary">
+<!-- Top Navigation Shell -->
+<header class="fixed top-0 w-full z-50 bg-neutral-50/80 dark:bg-black/80 backdrop-blur-md flex justify-between items-center px-6 h-16 w-full max-w-none">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-black dark:text-white cursor-pointer hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors rounded p-1">menu</span>
+<h1 class="font-['Inter'] font-extrabold tracking-tighter uppercase text-xl font-black tracking-[0.2em] text-black dark:text-white">KINETIC</h1>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest overflow-hidden">
+<img alt="Focused athlete portrait" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCw_MV2FXFmEzTONlzwAEutCVCYG1qgY4AFSgyQTpw-XWp9Vv0nhCTTwI9pVVVJMbsbgEgeu6Uor8oMgQpuHfaqf8tNYSjY-WDbhHfnR0fdwZePiyBH60dcgIdoqRH4vlhZe51-WFVGP0folzQnTCRPTClYds4JY4-yInU3co8wf-Dek2p0DyiV-Vaj82iSM3GzfyNc8ftRcSr-1GDuDcWqvPcerOnSh0AQNmSaxWk-IwOHCF9KIv8MTtV7lMcuU4jGwuT48pO2SoDK"/>
+</div>
+</header>
+<main class="pt-24 px-6 max-w-3xl mx-auto pb-32">
+<!-- Hero Header -->
+<section class="mb-12">
+<div class="flex flex-col gap-1">
+<span class="label-sm font-semibold uppercase tracking-[0.2em] text-tertiary text-[10px]">Active Routine</span>
+<h2 class="display-lg text-6xl font-black kinetic-archive-header uppercase leading-none">PUSH DAY</h2>
+<div class="mt-4 flex items-center gap-6">
+<div>
+<p class="label-sm uppercase text-[10px] text-outline tracking-widest">Est. Duration</p>
+<p class="headline-sm font-bold">55 MIN</p>
+</div>
+<div class="w-px h-8 bg-surface-container-highest"></div>
+<div>
+<p class="label-sm uppercase text-[10px] text-outline tracking-widest">Focus</p>
+<p class="headline-sm font-bold">HYPERTROPHY</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Exercise List -->
+<section class="space-y-6">
+<div class="flex items-center justify-between border-b border-surface-container-highest pb-2">
+<h3 class="label-sm font-bold uppercase tracking-widest text-on-surface-variant">Exercises</h3>
+<span class="label-sm text-outline">3 Total</span>
+</div>
+<!-- Exercise Row: Bench Press -->
+<div class="group relative bg-surface-container-lowest p-6 hover:bg-surface-dim transition-all duration-200 scale-98 active:scale-95 cursor-pointer">
+<div class="flex justify-between items-start">
+<div class="flex flex-col gap-1">
+<h4 class="headline-sm font-extrabold text-xl uppercase tracking-tight">Bench Press</h4>
+<p class="title-sm text-tertiary font-medium">100kg x 8 <span class="text-outline mx-2">|</span> 4 Sets</p>
+</div>
+<div class="flex flex-col items-end gap-1">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-[#2E7D32]"></div>
+<span class="label-sm font-bold text-[#2E7D32]">+2.5%</span>
+</div>
+<span class="label-sm text-[10px] text-outline uppercase tracking-tighter">vs Last Session</span>
+</div>
+</div>
+</div>
+<!-- Exercise Row: Dips -->
+<div class="group relative bg-surface-container-lowest p-6 hover:bg-surface-dim transition-all duration-200 scale-98 active:scale-95 cursor-pointer">
+<div class="flex justify-between items-start">
+<div class="flex flex-col gap-1">
+<h4 class="headline-sm font-extrabold text-xl uppercase tracking-tight">Weighted Dips</h4>
+<p class="title-sm text-tertiary font-medium">BW + 20kg x 12 <span class="text-outline mx-2">|</span> 3 Sets</p>
+</div>
+<div class="flex flex-col items-end gap-1">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-[#2E7D32]"></div>
+<span class="label-sm font-bold text-[#2E7D32]">Stable</span>
+</div>
+<span class="label-sm text-[10px] text-outline uppercase tracking-tighter">Consistency Peak</span>
+</div>
+</div>
+</div>
+<!-- Exercise Row: Shoulder Press (Risk Alert) -->
+<div class="group relative bg-surface-container-lowest p-6 hover:bg-surface-dim transition-all duration-200 scale-98 active:scale-95 cursor-pointer">
+<div class="flex justify-between items-start">
+<div class="flex flex-col gap-1">
+<h4 class="headline-sm font-extrabold text-xl uppercase tracking-tight">Shoulder Press</h4>
+<p class="title-sm text-tertiary font-medium">60kg x 6 <span class="text-outline mx-2">|</span> 3 Sets</p>
+</div>
+<div class="flex flex-col items-end gap-1">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-error animate-pulse"></div>
+<span class="label-sm font-bold text-error">+15.0%</span>
+</div>
+<span class="label-sm text-[10px] text-error uppercase tracking-tighter">High Jump Risk</span>
+</div>
+</div>
+</div>
+<!-- Add Exercise Action -->
+<button class="w-full py-8 mt-4 border-2 border-dashed border-surface-container-highest hover:border-primary hover:bg-surface-container-low transition-all group flex flex-col items-center justify-center gap-2">
+<span class="material-symbols-outlined text-tertiary group-hover:text-primary">add_box</span>
+<span class="label-sm uppercase font-bold tracking-[0.2em] text-tertiary group-hover:text-primary">Add Exercise</span>
+</button>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 pb-safe bg-neutral-50/80 dark:bg-neutral-900/80 backdrop-blur-md border-t border-neutral-200/20 dark:border-neutral-800/20 z-50">
+<button class="flex flex-col items-center justify-center text-black dark:text-white bg-neutral-200 dark:bg-neutral-800 rounded-lg px-4 py-1 transition-all scale-98 active:scale-95">
+<span class="material-symbols-outlined">fitness_center</span>
+<span class="font-['Inter'] font-semibold uppercase tracking-[0.1em] text-[10px] mt-0.5">Workouts</span>
+</button>
+<button class="flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-600 px-4 py-1 transition-all hover:bg-neutral-100 dark:hover:bg-neutral-800 scale-98 active:scale-95">
+<span class="material-symbols-outlined">reorder</span>
+<span class="font-['Inter'] font-semibold uppercase tracking-[0.1em] text-[10px] mt-0.5">Circuits</span>
+</button>
+<button class="flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-600 px-4 py-1 transition-all hover:bg-neutral-100 dark:hover:bg-neutral-800 scale-98 active:scale-95">
+<span class="material-symbols-outlined">self_improvement</span>
+<span class="font-['Inter'] font-semibold uppercase tracking-[0.1em] text-[10px] mt-0.5">Stretch</span>
+</button>
+</nav>
+</body></html>

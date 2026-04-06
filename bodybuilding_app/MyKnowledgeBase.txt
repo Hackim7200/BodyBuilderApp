@@ -1,0 +1,26 @@
+Training targets
+Strength target sets: digits only, 1-12; target reps: digits only, 1-80. Timer exercises use the same target sets bounds (RoutineExercise.targetSets, validateTargetSetsOnly). Shared rules in lib/core/utils/training_target_input.dart (TrainingTargetInput).
+
+Routine % vs feature Exercise model
+Routine exercise rows use Amplify models and exercise_dashboard_screen _placeholderDeltaPercent (listIndex % 3: +2.5%, -3.0%, 0 stable, repeating) until real session history exists. lib/feature/exercise/models/exercise.dart has no dummy lists (removed unused); progressPercent there is for in-memory UI only when screens pass that model.
+
+Workout exercise detail wiring
+Tapping a row on RoutineDetailScreen (exercise_dashboard_screen _ExerciseTile) pushes ExerciseDetailScreen with feature Exercise built by exerciseForWorkoutDetail in lib/feature/exercise/models/exercise_ui_mapper.dart (Amplify Exercise? + RoutineExercise + listIndex for defaults). Keeps list subtitles and detail targets aligned; timer type follows amplify Exercise.type == 'timer'; duration on UI model stays null until schema adds a target duration (TimerExerciseView uses its dummy target).
+
+Strength session log UI
+Session grid is lib/feature/workout/widgets/session_log_table.dart only (no add-set bottom sheet). One editable row at a time; max sets from exercise.sets (clamped 1–12); FINISH hides the footer and locks the table.
+
+Technique notes (per Exercise, not WorkoutLog)
+GraphQL Exercise has optional `techniques: String`. Amplify model lib/models/Exercise.dart was updated to match (regenerate with `amplify codegen models` after schema pulls if needed). ExerciseTechniquesService loads/saves by Amplify Exercise.id. TechniqueNotesCard uses feature Exercise.id as amplifyExerciseId and only renders when stored techniques are non-empty (no dummy fallback). WorkoutLog.notes is unused for technique UI.
+
+Technique notes app bar + save
+ExerciseDetailScreen: edit_note action for all strength sessions. showTechniqueNotesEditor prefills from ExerciseTechniquesService.techniquesForEditor. Save updates the Exercise row via copyWith(techniques: …). Successful save bumps techniqueNotesRefreshToken so TechniqueNotesCard refetches.
+
+Strength sets persistence (DataStore)
+WorkoutLog is keyed by routineExerciseId + session date; SetEntry rows use workoutLogId. SessionSetsService (lib/feature/workout/data/session_sets_service.dart) getOrCreateTodaysLog matches logs whose date falls on the same local calendar day (UTC stored via TemporalDateTime). Feature-layer SetEntry in workout_log.dart carries optional datastoreId for upserts. StrengthExerciseView persists when exercise.routineExerciseId is non-null; otherwise behavior stays in-memory only. ADD SET with persistence uses _addingSet to avoid duplicate setNumber rows while DataStore.save is in flight.
+
+KineticAppBar profile / sign-in
+Icons.person → `/sign-in` only when `showProfileButton: true`. Set on RoutineDashboardScreen, CircuitDashboardScreen, StretchScreen; nested flows (routine detail, exercise detail, create/edit routine, add/edit exercise) omit it.
+
+Routine exercise edit + delete
+EditExerciseScreen (lib/feature/routine/screens/edit_exercise_screen.dart): same form pattern as add exercise; SAVE CHANGES + “Delete Exercise” under it. Opened from workout page (ExerciseDetailScreen app bar edit) when routineLink + amplifyExercise are passed from routine detail navigation; pops `'saved'` / `'deleted'` so the workout screen can refetch or pop. RoutineExerciseService.updateExerciseInRoutine saves Exercise + RoutineExercise; deleteExerciseEntry cascades WorkoutLog/SetEntry then link + Exercise.

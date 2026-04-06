@@ -1,0 +1,198 @@
+# Cursor Rules
+
+You are an expert software engineer. Follow these rules strictly in every response.
+
+---
+
+## Core Philosophy
+
+- Prioritize simplicity over complexity
+- Avoid overengineering
+- Write clean, readable, maintainable code
+- Follow modern best practices and up-to-date documentation
+- Maintain consistent patterns across the codebase
+
+---
+
+## Terminal Rules
+
+- Always provide commands for the terminal
+- Never execute commands on behalf of the user
+
+---
+
+## Readability & Maintainability
+
+- Code must be human-readable
+- Use clear and descriptive naming
+- Follow modern coding standards
+- Keep logic easy to follow and maintain
+
+---
+
+## Comment Rules
+
+- Never delete existing comments unless the related code is removed
+- Always explain WHY, not WHAT
+- Add comments for non-obvious decisions
+- Keep comments concise and human-readable
+
+---
+
+## Naming Conventions
+
+- Variables → camelCase
+- Functions → camelCase
+- Classes / Widgets → PascalCase
+- Files → snake_case.dart
+
+---
+
+## Code Style
+
+- Prefer small, simple functions
+- Max function length: 40 lines
+- Avoid deep nesting
+- Avoid unnecessary abstraction
+- Keep logic straightforward
+
+---
+
+## Development Rules
+
+- Keep code consistent across the project
+- Follow existing patterns before introducing new ones
+- Use latest stable libraries and standards
+- Avoid unnecessary dependencies
+- Focus on maintainability and clarity
+
+---
+
+## Knowledge Base Rule
+
+Maintain a file called `MyKnowledgeBase.txt` in the project root.
+
+- If the file does not exist, create it
+- add new significant insights learned that will be useful for future projects
+- avoid adding very simple insights that can be easily found in the internet
+- include insights that are not obvious and require thinking
+- insights that you learn about the architectue e.g. CDK, Amplify, State management, etc.
+```
+
+Format the file like this:
+
+-----Topic Title-----
+Insight 1: 
+Insight 2: 
+Lesson learned: 
+
+-----Topic Title-----
+Insight 1: 
+Insight 2: 
+Lesson learned: 
+
+-----Topic Title-----
+Insight 1: 
+Description: 
+Insight 1: 
+Insight 2: 
+Lesson learned: 
+Insight 2: 
+Lesson learned: 
+```
+
+---
+
+## Anti-Patterns
+
+Never do the following:
+
+- Overengineer simple features
+- Create large monolithic classes
+- Mix UI and business logic
+- Delete comments unnecessarily
+- Write unclear or overly abstract code
+
+---
+
+## Best Practices
+
+Always do the following:
+
+- Use descriptive naming
+- Break code into logical components
+- Keep files focused and small
+- Follow consistent patterns
+- Write code for future maintainers
+
+---
+
+## Project Structure
+
+Use a feature-first architecture:
+
+```
+lib/
+├── main.dart
+│
+├── app/
+│   ├── app.dart
+│   ├── router.dart
+│   │
+│   ├── theme/
+│   │   ├── theme.dart
+│   │   ├── light_theme.dart
+│   │   └── dark_theme.dart
+│   │
+│   └── layout/
+│       └── app_layout.dart
+│
+├── core/
+│   ├── config/
+│   ├── utils/
+│   ├── widgets/
+│   ├── services/
+│   └── icons/
+│
+├── shared/
+│   ├── models/
+│   └── widgets/
+│
+└── features/
+    ├── todo/
+    │   ├── screens/
+    │   ├── widgets/
+    │   ├── services/
+    │   ├── models/
+    │   └── subscreens/
+    │
+    ├── event/
+    ├── auth/
+    ├── pomodoro/
+    ├── guest/
+    └── profile/
+```
+
+Each feature must contain:
+
+- `screens/`
+- `widgets/`
+- `services/`
+- `models/`
+- `subscreens/`
+
+---
+
+## Architecture Rules
+
+- Use feature-first structure
+- Prefer modular and decoupled design
+- When designing a UI for the first time, always use dummy data unless told otherwise
+
+---
+
+## Final Rule
+
+Code should be easy to read, easy to change, and easy to scale.
+
+If it feels complex — simplify it.
