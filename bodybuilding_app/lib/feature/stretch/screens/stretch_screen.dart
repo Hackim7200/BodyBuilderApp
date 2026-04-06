@@ -8,7 +8,7 @@ class StretchScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      appBar: KineticAppBar(title: 'STRETCH', showProfileButton: true),
+      appBar: KineticAppBar(showProfileButton: true),
       body: EmptyStateWidget(
         icon: Icons.self_improvement_outlined,
         title: 'Coming Soon',

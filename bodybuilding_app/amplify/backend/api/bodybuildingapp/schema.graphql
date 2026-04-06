@@ -28,13 +28,31 @@ type RoutineExercise @model {
   restSeconds: Int
 }
 
+type Circuit @model {
+  id: ID!
+  name: String!
+  description: String
+  rounds: Int
+  stationDurationSeconds: Int
+  # When true, play shuffles station order once per session; when false/null, uses list order.
+  randomizeStationOrder: Boolean
+}
+
+type CircuitExercise @model {
+  id: ID!
+  circuitId: ID!
+  exerciseId: ID!
+  orderIndex: Int!
+}
+
 type WorkoutLog @model {
   id: ID!
   routineExerciseId: ID!
   date: AWSDateTime!
   notes: String
 }
-// each workout log has many set entry  4 sets 4 sets Entry
+
+# Each workout log has many set entries (e.g. 4 sets → 4 SetEntry rows).
 type SetEntry @model {
   id: ID!
   workoutLogId: ID!
@@ -44,3 +62,6 @@ type SetEntry @model {
   durationSeconds: Int
   isCompleted: Boolean
 }
+
+
+

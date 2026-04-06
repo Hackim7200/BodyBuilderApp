@@ -13,7 +13,7 @@ class OverloadTrackerApp extends StatelessWidget {
     // return Authenticator(
     //   child: MaterialApp.router(
     return MaterialApp.router(
-      title: 'Overload Tracker',
+      title: 'KINETIC',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
