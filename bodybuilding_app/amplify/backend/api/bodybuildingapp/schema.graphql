@@ -59,6 +59,8 @@ type SetEntry @model {
   setNumber: Int!
   weight: Float
   reps: Int
+  # weight × reps for this set when both are logged; null when incomplete.
+  trainingLoad: Float
   durationSeconds: Int
   isCompleted: Boolean
 }

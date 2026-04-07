@@ -1,3 +1,5 @@
+import 'package:bodybuilding_app/core/utils/training_target_input.dart';
+
 class _Unset {
   const _Unset();
 }
@@ -5,11 +7,24 @@ class _Unset {
 /// Distinguishes “omit field” from “set to null” in [SetEntry.copyWith].
 const _unset = _Unset();
 
+/// `weight * reps` when both are in the same valid ranges as the session grid; otherwise null.
+double? trainingLoadForStrengthSet(double? weight, int? reps) {
+  if (weight == null || weight <= 0 || weight > 999.5) return null;
+  if (reps == null ||
+      reps < TrainingTargetInput.minReps ||
+      reps > TrainingTargetInput.maxReps) {
+    return null;
+  }
+  return weight * reps;
+}
+
 class SetEntry {
   final int setNumber;
   final double? weight;
   final int? reps;
   final bool isCompleted;
+  /// weight × reps for this set when complete; mirrored in DataStore [trainingLoad].
+  final double? trainingLoad;
   /// DataStore primary key for [SetEntry] when persisted; null for new rows.
   final String? datastoreId;
 
@@ -18,6 +33,7 @@ class SetEntry {
     this.weight,
     this.reps,
     this.isCompleted = false,
+    this.trainingLoad,
     this.datastoreId,
   });
 
@@ -26,6 +42,7 @@ class SetEntry {
     Object? weight = _unset,
     Object? reps = _unset,
     bool? isCompleted,
+    Object? trainingLoad = _unset,
     Object? datastoreId = _unset,
   }) {
     return SetEntry(
@@ -33,6 +50,9 @@ class SetEntry {
       weight: identical(weight, _unset) ? this.weight : weight as double?,
       reps: identical(reps, _unset) ? this.reps : reps as int?,
       isCompleted: isCompleted ?? this.isCompleted,
+      trainingLoad: identical(trainingLoad, _unset)
+          ? this.trainingLoad
+          : trainingLoad as double?,
       datastoreId: identical(datastoreId, _unset)
           ? this.datastoreId
           : datastoreId as String?,

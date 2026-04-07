@@ -6,9 +6,9 @@ import 'package:bodybuilding_app/feature/workout/models/workout_log.dart';
 
 const double _setColWidth = 48;
 
-/// Strength set grid: only [editableRowIndex] uses text fields; earlier rows are read-only.
-/// [IntrinsicHeight] on rows avoids unbounded-height layout when this sits in a [ListView].
-class SessionLogTable extends StatelessWidget {
+/// Strength set grid: only the row at [editableRowIndex] is editable; rows above are read-only
+/// after the user taps **ADD SET**. [IntrinsicHeight] avoids unbounded height in a [ListView].
+class SessionLogTable extends StatefulWidget {
   final List<SetEntry> sets;
   final int? editableRowIndex;
   final bool workoutFinished;
@@ -28,14 +28,33 @@ class SessionLogTable extends StatelessWidget {
     this.onPrimaryAction,
   });
 
-  String get _primaryLabel =>
-      sets.length < maxSets ? 'ADD SET' : 'FINISH WORKOUT';
+  @override
+  State<SessionLogTable> createState() => SessionLogTableState();
+}
 
-  bool get _showPrimaryButton => !workoutFinished && onPrimaryAction != null;
+class SessionLogTableState extends State<SessionLogTable> {
+  final GlobalKey<_EditableLogSetRowState> _editableRowKey = GlobalKey();
+
+  /// Pushes the active row text fields into [onSetCommitted] before ADD SET / FINISH checks.
+  void commitPendingEdits() {
+    _editableRowKey.currentState?.flushToParent();
+  }
+
+  String get _primaryLabel =>
+      widget.sets.length < widget.maxSets ? 'ADD SET' : 'FINISH WORKOUT';
+
+  bool get _showPrimaryButton =>
+      !widget.workoutFinished && widget.onPrimaryAction != null;
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final sets = widget.sets;
+    final editableRowIndex = widget.editableRowIndex;
+    final onSetCommitted = widget.onSetCommitted;
+    final primaryButtonEnabled = widget.primaryButtonEnabled;
+    final onPrimaryAction = widget.onPrimaryAction;
+    final maxSets = widget.maxSets;
 
     return Container(
       clipBehavior: Clip.antiAlias,
@@ -110,7 +129,7 @@ class SessionLogTable extends StatelessWidget {
                 editableRowIndex != null && e.key == editableRowIndex;
             if (editable) {
               return _EditableLogSetRow(
-                key: ValueKey('edit_${e.value.setNumber}'),
+                key: _editableRowKey,
                 rowIndex: e.key,
                 entry: e.value,
                 onCommitted: onSetCommitted,
@@ -310,6 +329,11 @@ class _EditableLogSetRowState extends State<_EditableLogSetRow> {
   @override
   void didUpdateWidget(covariant _EditableLogSetRow oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.entry.setNumber != widget.entry.setNumber) {
+      _weightCtrl.text = _weightFieldText(widget.entry.weight);
+      _repsCtrl.text = widget.entry.reps != null ? '${widget.entry.reps}' : '';
+      return;
+    }
     if (!_weightFocus.hasFocus &&
         oldWidget.entry.weight != widget.entry.weight) {
       _weightCtrl.text = _weightFieldText(widget.entry.weight);
@@ -337,6 +361,9 @@ class _EditableLogSetRowState extends State<_EditableLogSetRow> {
   void _onRepsFocusChange() {
     if (!_repsFocus.hasFocus) _commit();
   }
+
+  /// Called before ADD SET / FINISH so controller text is merged into parent state.
+  void flushToParent() => _commit();
 
   /// Writes parsed cells to parent so ADD SET / FINISH enables without an extra blur.
   void _commit() {
@@ -371,16 +398,18 @@ class _EditableLogSetRowState extends State<_EditableLogSetRow> {
       }
     }
 
-    final completed = w != null && r != null;
+    final load = trainingLoadForStrengthSet(w, r);
     final updated = widget.entry.copyWith(
       weight: w,
       reps: r,
-      isCompleted: completed,
+      isCompleted: load != null,
+      trainingLoad: load,
     );
 
     if (updated.weight != widget.entry.weight ||
         updated.reps != widget.entry.reps ||
-        updated.isCompleted != widget.entry.isCompleted) {
+        updated.isCompleted != widget.entry.isCompleted ||
+        updated.trainingLoad != widget.entry.trainingLoad) {
       widget.onCommitted(widget.rowIndex, updated);
     }
   }

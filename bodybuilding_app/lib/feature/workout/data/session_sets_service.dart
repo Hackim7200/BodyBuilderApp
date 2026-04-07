@@ -51,11 +51,14 @@ class SessionSetsService {
   }
 
   session.SetEntry _fromDatastore(ds.SetEntry m) {
+    final load = m.trainingLoad ??
+        session.trainingLoadForStrengthSet(m.weight, m.reps);
     return session.SetEntry(
       setNumber: m.setNumber,
       weight: m.weight,
       reps: m.reps,
       isCompleted: m.isCompleted ?? false,
+      trainingLoad: load,
       datastoreId: m.id,
     );
   }
@@ -65,15 +68,17 @@ class SessionSetsService {
     String workoutLogId,
     session.SetEntry entry,
   ) async {
+    final load = session.trainingLoadForStrengthSet(entry.weight, entry.reps);
     final m = ds.SetEntry(
       id: entry.datastoreId,
       workoutLogId: workoutLogId,
       setNumber: entry.setNumber,
       weight: entry.weight,
       reps: entry.reps,
+      trainingLoad: load,
       isCompleted: entry.isCompleted,
     );
     await Amplify.DataStore.save(m);
-    return entry.copyWith(datastoreId: m.id);
+    return entry.copyWith(datastoreId: m.id, trainingLoad: load);
   }
 }

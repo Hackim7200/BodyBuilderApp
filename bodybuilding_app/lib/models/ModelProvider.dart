@@ -38,7 +38,7 @@ export 'WorkoutLog.dart';
 
 class ModelProvider implements amplify_core.ModelProviderInterface {
   @override
-  String version = "8f2a9c1d4e6b7a8091c2d3e4f5a6b7c9a";
+  String version = "bf2a9c1d4e6b7a8091c2d3e4f5a6b7c9a";
   @override
   List<amplify_core.ModelSchema> modelSchemas = [
     Circuit.schema,

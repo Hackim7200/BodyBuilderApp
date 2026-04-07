@@ -10,6 +10,35 @@ import 'package:bodybuilding_app/feature/workout/widgets/performance_archive.dar
 import 'package:bodybuilding_app/feature/workout/widgets/stat_card.dart';
 import 'package:bodybuilding_app/app/themes/app_theme.dart';
 
+bool _strengthSetHasValues(SetEntry s) {
+  final w = s.weight;
+  final r = s.reps;
+  if (w == null || w <= 0 || w > 999.5) return false;
+  if (r == null ||
+      r < TrainingTargetInput.minReps ||
+      r > TrainingTargetInput.maxReps) {
+    return false;
+  }
+  return true;
+}
+
+/// True when each set index `1..maxSets` appears on exactly one row with valid weight+reps.
+///
+/// Uses [SetEntry.setNumber] as the source of truth, not list order, so renumbering or
+/// extra rows (e.g. set `99`) do not break detection as long as slots `1..maxSets` exist and are complete.
+/// Duplicate or missing indices keep the session "in progress" until the data matches.
+bool _strengthSessionLooksComplete(List<SetEntry> sets, int maxSets) {
+  for (var n = 1; n <= maxSets; n++) {
+    final forN = sets.where((s) => s.setNumber == n).toList();
+    if (forN.length != 1) return false;
+    if (!_strengthSetHasValues(forN.single)) return false;
+  }
+  return true;
+}
+
+/// Strength session grid: one editable row at a time (the latest set).
+/// Enter weight and reps, tap **ADD SET** to lock that row and open the next;
+/// on the last target set, tap **FINISH WORKOUT** to lock the table.
 class StrengthExerciseView extends StatefulWidget {
   final Exercise exercise;
   /// Bumps [TechniqueNotesCard] key so saved notes refetch from DataStore.
@@ -32,6 +61,8 @@ class _StrengthExerciseViewState extends State<StrengthExerciseView> {
   bool _addingSet = false;
   String? _workoutLogId;
   final SessionSetsService _sessionSetsService = SessionSetsService();
+  final GlobalKey<SessionLogTableState> _sessionTableKey =
+      GlobalKey<SessionLogTableState>();
 
   int get _maxSets {
     final n = widget.exercise.sets;
@@ -49,18 +80,8 @@ class _StrengthExerciseViewState extends State<StrengthExerciseView> {
     return _sets.length - 1;
   }
 
-  bool get _lastRowComplete {
-    final last = _sets.last;
-    final w = last.weight;
-    final r = last.reps;
-    if (w == null || w <= 0 || w > 999.5) return false;
-    if (r == null ||
-        r < TrainingTargetInput.minReps ||
-        r > TrainingTargetInput.maxReps) {
-      return false;
-    }
-    return true;
-  }
+  bool get _lastRowComplete =>
+      _sets.isNotEmpty && _strengthSetHasValues(_sets.last);
 
   @override
   void initState() {
@@ -83,6 +104,7 @@ class _StrengthExerciseViewState extends State<StrengthExerciseView> {
         if (loaded.isNotEmpty) {
           _sets = loaded;
         }
+        _workoutFinished = _strengthSessionLooksComplete(_sets, _maxSets);
         _sessionReady = true;
       });
     } catch (e, st) {
@@ -104,8 +126,9 @@ class _StrengthExerciseViewState extends State<StrengthExerciseView> {
   }
 
   void _onPrimaryAction() {
+    _sessionTableKey.currentState?.commitPendingEdits();
     FocusScope.of(context).unfocus();
-    // Next frame so focus-dismiss commits from the active row are applied to list state.
+    // Next frame so any focus-dismiss commits land before we validate / persist.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       if (!_lastRowComplete) {
@@ -122,32 +145,51 @@ class _StrengthExerciseViewState extends State<StrengthExerciseView> {
         final logId = _workoutLogId;
         if (logId != null) {
           setState(() => _addingSet = true);
-          _sessionSetsService
-              .persistSet(
-                logId,
-                SetEntry(setNumber: nextNumber),
-              )
-              .then((row) {
-                if (mounted) {
-                  setState(() {
-                    _sets.add(row);
-                    _addingSet = false;
-                  });
-                }
-              })
-              .catchError((Object e, StackTrace st) {
-                safePrint('SessionSetsService add set failed: $e $st');
-                if (mounted) setState(() => _addingSet = false);
-              });
+          _persistAndAddSet(logId, nextNumber);
         } else {
           setState(() {
             _sets.add(SetEntry(setNumber: nextNumber));
           });
         }
       } else {
-        setState(() => _workoutFinished = true);
+        _finishWorkout(logId: _workoutLogId);
       }
     });
+  }
+
+  /// Locks the grid immediately; persists the last row in the background when online.
+  void _finishWorkout({String? logId}) {
+    final lastIndex = _sets.length - 1;
+    final lastEntry = _sets[lastIndex];
+    setState(() => _workoutFinished = true);
+    if (logId == null) return;
+    _sessionSetsService.persistSet(logId, lastEntry).then((saved) {
+      if (mounted) setState(() => _sets[lastIndex] = saved);
+    }).catchError((Object e, StackTrace st) {
+      safePrint('SessionSetsService finish persist failed: $e $st');
+    });
+  }
+
+  Future<void> _persistAndAddSet(String logId, int nextNumber) async {
+    try {
+      final lastIndex = _sets.length - 1;
+      final savedLast =
+          await _sessionSetsService.persistSet(logId, _sets[lastIndex]);
+      if (!mounted) return;
+      setState(() => _sets[lastIndex] = savedLast);
+      final newRow = await _sessionSetsService.persistSet(
+        logId,
+        SetEntry(setNumber: nextNumber),
+      );
+      if (!mounted) return;
+      setState(() {
+        _sets.add(newRow);
+        _addingSet = false;
+      });
+    } catch (e, st) {
+      safePrint('SessionSetsService add set failed: $e $st');
+      if (mounted) setState(() => _addingSet = false);
+    }
   }
 
   @override
@@ -160,6 +202,7 @@ class _StrengthExerciseViewState extends State<StrengthExerciseView> {
         ),
         const SizedBox(height: 16),
         SessionLogTable(
+          key: _sessionTableKey,
           sets: _sets,
           editableRowIndex: _sessionReady ? _editableRowIndex : null,
           workoutFinished: _workoutFinished,

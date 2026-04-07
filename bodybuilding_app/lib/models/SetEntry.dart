@@ -31,6 +31,7 @@ class SetEntry extends amplify_core.Model {
   final int? _setNumber;
   final double? _weight;
   final int? _reps;
+  final double? _trainingLoad;
   final int? _durationSeconds;
   final bool? _isCompleted;
   final amplify_core.TemporalDateTime? _createdAt;
@@ -82,6 +83,10 @@ class SetEntry extends amplify_core.Model {
   int? get reps {
     return _reps;
   }
+
+  double? get trainingLoad {
+    return _trainingLoad;
+  }
   
   int? get durationSeconds {
     return _durationSeconds;
@@ -99,15 +104,16 @@ class SetEntry extends amplify_core.Model {
     return _updatedAt;
   }
   
-  const SetEntry._internal({required this.id, required workoutLogId, required setNumber, weight, reps, durationSeconds, isCompleted, createdAt, updatedAt}): _workoutLogId = workoutLogId, _setNumber = setNumber, _weight = weight, _reps = reps, _durationSeconds = durationSeconds, _isCompleted = isCompleted, _createdAt = createdAt, _updatedAt = updatedAt;
+  const SetEntry._internal({required this.id, required workoutLogId, required setNumber, weight, reps, trainingLoad, durationSeconds, isCompleted, createdAt, updatedAt}): _workoutLogId = workoutLogId, _setNumber = setNumber, _weight = weight, _reps = reps, _trainingLoad = trainingLoad, _durationSeconds = durationSeconds, _isCompleted = isCompleted, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory SetEntry({String? id, required String workoutLogId, required int setNumber, double? weight, int? reps, int? durationSeconds, bool? isCompleted}) {
+  factory SetEntry({String? id, required String workoutLogId, required int setNumber, double? weight, int? reps, double? trainingLoad, int? durationSeconds, bool? isCompleted}) {
     return SetEntry._internal(
       id: id == null ? amplify_core.UUID.getUUID() : id,
       workoutLogId: workoutLogId,
       setNumber: setNumber,
       weight: weight,
       reps: reps,
+      trainingLoad: trainingLoad,
       durationSeconds: durationSeconds,
       isCompleted: isCompleted);
   }
@@ -125,6 +131,7 @@ class SetEntry extends amplify_core.Model {
       _setNumber == other._setNumber &&
       _weight == other._weight &&
       _reps == other._reps &&
+      _trainingLoad == other._trainingLoad &&
       _durationSeconds == other._durationSeconds &&
       _isCompleted == other._isCompleted;
   }
@@ -142,6 +149,7 @@ class SetEntry extends amplify_core.Model {
     buffer.write("setNumber=" + (_setNumber != null ? _setNumber!.toString() : "null") + ", ");
     buffer.write("weight=" + (_weight != null ? _weight!.toString() : "null") + ", ");
     buffer.write("reps=" + (_reps != null ? _reps!.toString() : "null") + ", ");
+    buffer.write("trainingLoad=" + (_trainingLoad != null ? _trainingLoad!.toString() : "null") + ", ");
     buffer.write("durationSeconds=" + (_durationSeconds != null ? _durationSeconds!.toString() : "null") + ", ");
     buffer.write("isCompleted=" + (_isCompleted != null ? _isCompleted!.toString() : "null") + ", ");
     buffer.write("createdAt=" + (_createdAt != null ? _createdAt!.format() : "null") + ", ");
@@ -151,13 +159,14 @@ class SetEntry extends amplify_core.Model {
     return buffer.toString();
   }
   
-  SetEntry copyWith({String? workoutLogId, int? setNumber, double? weight, int? reps, int? durationSeconds, bool? isCompleted}) {
+  SetEntry copyWith({String? workoutLogId, int? setNumber, double? weight, int? reps, double? trainingLoad, int? durationSeconds, bool? isCompleted}) {
     return SetEntry._internal(
       id: id,
       workoutLogId: workoutLogId ?? this.workoutLogId,
       setNumber: setNumber ?? this.setNumber,
       weight: weight ?? this.weight,
       reps: reps ?? this.reps,
+      trainingLoad: trainingLoad ?? this.trainingLoad,
       durationSeconds: durationSeconds ?? this.durationSeconds,
       isCompleted: isCompleted ?? this.isCompleted);
   }
@@ -167,6 +176,7 @@ class SetEntry extends amplify_core.Model {
     ModelFieldValue<int>? setNumber,
     ModelFieldValue<double?>? weight,
     ModelFieldValue<int?>? reps,
+    ModelFieldValue<double?>? trainingLoad,
     ModelFieldValue<int?>? durationSeconds,
     ModelFieldValue<bool?>? isCompleted
   }) {
@@ -176,6 +186,7 @@ class SetEntry extends amplify_core.Model {
       setNumber: setNumber == null ? this.setNumber : setNumber.value,
       weight: weight == null ? this.weight : weight.value,
       reps: reps == null ? this.reps : reps.value,
+      trainingLoad: trainingLoad == null ? this.trainingLoad : trainingLoad.value,
       durationSeconds: durationSeconds == null ? this.durationSeconds : durationSeconds.value,
       isCompleted: isCompleted == null ? this.isCompleted : isCompleted.value
     );
@@ -187,13 +198,14 @@ class SetEntry extends amplify_core.Model {
       _setNumber = (json['setNumber'] as num?)?.toInt(),
       _weight = (json['weight'] as num?)?.toDouble(),
       _reps = (json['reps'] as num?)?.toInt(),
+      _trainingLoad = (json['trainingLoad'] as num?)?.toDouble(),
       _durationSeconds = (json['durationSeconds'] as num?)?.toInt(),
       _isCompleted = json['isCompleted'],
       _createdAt = json['createdAt'] != null ? amplify_core.TemporalDateTime.fromString(json['createdAt']) : null,
       _updatedAt = json['updatedAt'] != null ? amplify_core.TemporalDateTime.fromString(json['updatedAt']) : null;
   
   Map<String, dynamic> toJson() => {
-    'id': id, 'workoutLogId': _workoutLogId, 'setNumber': _setNumber, 'weight': _weight, 'reps': _reps, 'durationSeconds': _durationSeconds, 'isCompleted': _isCompleted, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+    'id': id, 'workoutLogId': _workoutLogId, 'setNumber': _setNumber, 'weight': _weight, 'reps': _reps, 'trainingLoad': _trainingLoad, 'durationSeconds': _durationSeconds, 'isCompleted': _isCompleted, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
   
   Map<String, Object?> toMap() => {
@@ -202,6 +214,7 @@ class SetEntry extends amplify_core.Model {
     'setNumber': _setNumber,
     'weight': _weight,
     'reps': _reps,
+    'trainingLoad': _trainingLoad,
     'durationSeconds': _durationSeconds,
     'isCompleted': _isCompleted,
     'createdAt': _createdAt,
@@ -214,6 +227,7 @@ class SetEntry extends amplify_core.Model {
   static final SETNUMBER = amplify_core.QueryField(fieldName: "setNumber");
   static final WEIGHT = amplify_core.QueryField(fieldName: "weight");
   static final REPS = amplify_core.QueryField(fieldName: "reps");
+  static final TRAININGLOAD = amplify_core.QueryField(fieldName: "trainingLoad");
   static final DURATIONSECONDS = amplify_core.QueryField(fieldName: "durationSeconds");
   static final ISCOMPLETED = amplify_core.QueryField(fieldName: "isCompleted");
   static var schema = amplify_core.Model.defineSchema(define: (amplify_core.ModelSchemaDefinition modelSchemaDefinition) {
@@ -244,6 +258,12 @@ class SetEntry extends amplify_core.Model {
       key: SetEntry.REPS,
       isRequired: false,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.int)
+    ));
+    
+    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
+      key: SetEntry.TRAININGLOAD,
+      isRequired: false,
+      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.double)
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
