@@ -3,6 +3,17 @@ import 'package:bodybuilding_app/feature/workout/models/workout_log.dart' as ses
 import 'package:bodybuilding_app/models/SetEntry.dart' as ds;
 import 'package:bodybuilding_app/models/WorkoutLog.dart' as ds;
 
+/// One saved [WorkoutLog] session’s total strength training load (Σ set loads).
+class WorkoutTrainingLoadPoint {
+  const WorkoutTrainingLoadPoint({
+    required this.date,
+    required this.totalTrainingLoad,
+  });
+
+  final DateTime date;
+  final double totalTrainingLoad;
+}
+
 /// Loads and saves strength [SetEntry] rows in DataStore for the current
 /// calendar day, scoped by [RoutineExercise] via [WorkoutLog.routineExerciseId].
 class SessionSetsService {
@@ -80,5 +91,42 @@ class SessionSetsService {
     );
     await Amplify.DataStore.save(m);
     return entry.copyWith(datastoreId: m.id, trainingLoad: load);
+  }
+
+  /// Most recent [limit] distinct [WorkoutLog]s for this routine exercise, oldest first.
+  /// Each point is the sum of per-set training load (stored or derived from weight × reps).
+  Future<List<WorkoutTrainingLoadPoint>> lastWorkoutsTrainingLoad(
+    String routineExerciseId, {
+    int limit = 7,
+  }) async {
+    final logs = await Amplify.DataStore.query(
+      ds.WorkoutLog.classType,
+      where: ds.WorkoutLog.ROUTINEEXERCISEID.eq(routineExerciseId),
+    );
+    if (logs.isEmpty) return [];
+
+    logs.sort((a, b) => b.date.compareTo(a.date));
+    final selected = logs.take(limit).toList()
+      ..sort((a, b) => a.date.compareTo(b.date));
+
+    final out = <WorkoutTrainingLoadPoint>[];
+    for (final log in selected) {
+      final sets = await loadSets(log.id);
+      var total = 0.0;
+      for (final s in sets) {
+        final load =
+            s.trainingLoad ?? session.trainingLoadForStrengthSet(s.weight, s.reps);
+        if (load != null) {
+          total += load;
+        }
+      }
+      out.add(
+        WorkoutTrainingLoadPoint(
+          date: log.date.getDateTimeInUtc().toLocal(),
+          totalTrainingLoad: total,
+        ),
+      );
+    }
+    return out;
   }
 }

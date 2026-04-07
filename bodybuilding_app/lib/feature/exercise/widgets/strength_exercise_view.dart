@@ -60,6 +60,8 @@ class _StrengthExerciseViewState extends State<StrengthExerciseView> {
   bool _sessionReady = true;
   bool _addingSet = false;
   String? _workoutLogId;
+  List<double> _trainingLoadSeries = [];
+  List<String> _trainingLoadLabels = [];
   final SessionSetsService _sessionSetsService = SessionSetsService();
   final GlobalKey<SessionLogTableState> _sessionTableKey =
       GlobalKey<SessionLogTableState>();
@@ -91,7 +93,35 @@ class _StrengthExerciseViewState extends State<StrengthExerciseView> {
     if (linkId != null) {
       _sessionReady = false;
       _loadPersistedSession(linkId);
+      _loadTrainingLoadHistory(linkId);
     }
+  }
+
+  Future<void> _loadTrainingLoadHistory(String routineExerciseId) async {
+    try {
+      final points = await _sessionSetsService.lastWorkoutsTrainingLoad(
+        routineExerciseId,
+        limit: 7,
+      );
+      if (!mounted) return;
+      setState(() {
+        _trainingLoadSeries =
+            points.map((p) => p.totalTrainingLoad).toList();
+        _trainingLoadLabels = points
+            .map((p) => '${p.date.month}/${p.date.day}')
+            .toList();
+      });
+    } catch (e, st) {
+      safePrint('Training load history failed: $e $st');
+    }
+  }
+
+  String get _latestTrainingLoadDisplay {
+    if (_trainingLoadSeries.isEmpty) return '—';
+    final v = _trainingLoadSeries.last;
+    if (v >= 1000) return v.round().toString();
+    if (v == v.roundToDouble()) return v.round().toString();
+    return v.toStringAsFixed(1);
   }
 
   Future<void> _loadPersistedSession(String routineExerciseId) async {
@@ -162,11 +192,26 @@ class _StrengthExerciseViewState extends State<StrengthExerciseView> {
     final lastIndex = _sets.length - 1;
     final lastEntry = _sets[lastIndex];
     setState(() => _workoutFinished = true);
-    if (logId == null) return;
+
+    void refreshHistory() {
+      final rid = widget.exercise.routineExerciseId;
+      if (rid != null) {
+        _loadTrainingLoadHistory(rid);
+      }
+    }
+
+    if (logId == null) {
+      refreshHistory();
+      return;
+    }
     _sessionSetsService.persistSet(logId, lastEntry).then((saved) {
-      if (mounted) setState(() => _sets[lastIndex] = saved);
+      if (mounted) {
+        setState(() => _sets[lastIndex] = saved);
+        refreshHistory();
+      }
     }).catchError((Object e, StackTrace st) {
       safePrint('SessionSetsService finish persist failed: $e $st');
+      refreshHistory();
     });
   }
 
@@ -217,11 +262,13 @@ class _StrengthExerciseViewState extends State<StrengthExerciseView> {
               !_sessionReady || _workoutFinished ? null : _onPrimaryAction,
         ),
         const SizedBox(height: 24),
-        const PerformanceArchive(
-          title: 'Performance Archive',
-          subtitle: 'Est. 1RM Progression',
-          currentValue: '112.5',
-          unit: 'KG',
+        PerformanceArchive(
+          title: 'Load progression',
+          subtitle: 'Total volume per session · last 7 workouts',
+          currentValue: _latestTrainingLoadDisplay,
+          unit: 'kg×reps',
+          series: _trainingLoadSeries,
+          xLabels: _trainingLoadLabels,
         ),
         const SizedBox(height: 24),
         Row(

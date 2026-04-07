@@ -1,13 +1,14 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:bodybuilding_app/feature/workout/models/workout_log.dart';
 
 class PerformanceArchive extends StatelessWidget {
   final String title;
   final String subtitle;
   final String currentValue;
   final String unit;
+  final List<double> series;
+  final List<String> xLabels;
 
   const PerformanceArchive({
     super.key,
@@ -15,6 +16,8 @@ class PerformanceArchive extends StatelessWidget {
     required this.subtitle,
     required this.currentValue,
     required this.unit,
+    this.series = const [],
+    this.xLabels = const [],
   });
 
   @override
@@ -104,13 +107,24 @@ class PerformanceArchive extends StatelessWidget {
               return SizedBox(
                 height: 100,
                 width: constraints.maxWidth,
-                child: CustomPaint(
-                  painter: _ChartPainter(
-                    data: WorkoutLog.dummyProgressionData,
-                    lineColor: cs.onSurface,
-                    dotColor: cs.onSurface,
-                  ),
-                ),
+                child: series.isEmpty
+                    ? Center(
+                        child: Text(
+                          'No workout history yet',
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: cs.tertiary,
+                          ),
+                        ),
+                      )
+                    : CustomPaint(
+                        painter: _ChartPainter(
+                          data: series,
+                          lineColor: cs.onSurface,
+                          dotColor: cs.onSurface,
+                        ),
+                      ),
               );
             },
           ),
@@ -127,22 +141,24 @@ class PerformanceArchive extends StatelessWidget {
               ),
             ),
             child: Row(
-              children: WorkoutLog.dummyProgressionLabels.map((label) {
-                final isCurrent = label == 'CURRENT';
-                return Expanded(
-                  child: Text(
-                    label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
-                      fontSize: 8,
-                      fontWeight: FontWeight.w700,
-                      color: isCurrent ? cs.primary : cs.tertiary,
+              children: [
+                for (var i = 0; i < xLabels.length; i++)
+                  Expanded(
+                    child: Text(
+                      xLabels[i],
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.inter(
+                        fontSize: 8,
+                        fontWeight: FontWeight.w700,
+                        color: i == xLabels.length - 1
+                            ? cs.primary
+                            : cs.tertiary,
+                      ),
                     ),
                   ),
-                );
-              }).toList(),
+              ],
             ),
           ),
         ],
@@ -184,7 +200,9 @@ class _ChartPainter extends CustomPainter {
     final points = <Offset>[];
 
     for (var i = 0; i < data.length; i++) {
-      final x = i * size.width / (data.length - 1);
+      final x = data.length == 1
+          ? size.width / 2
+          : i * size.width / (data.length - 1);
       final normalizedY = range == 0 ? 0.5 : (data[i] - minVal) / range;
       final y = size.height - (normalizedY * size.height);
       points.add(Offset(x, y));
@@ -205,5 +223,7 @@ class _ChartPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _ChartPainter oldDelegate) =>
-      data != oldDelegate.data;
+      data != oldDelegate.data ||
+      lineColor != oldDelegate.lineColor ||
+      dotColor != oldDelegate.dotColor;
 }
