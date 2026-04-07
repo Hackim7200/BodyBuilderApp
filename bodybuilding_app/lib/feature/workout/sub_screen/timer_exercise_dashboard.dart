@@ -4,16 +4,16 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:bodybuilding_app/app/themes/app_theme.dart';
 import 'package:bodybuilding_app/feature/exercise/models/exercise.dart';
 
-class TimerExerciseView extends StatefulWidget {
+class TimerExerciseDashboard extends StatefulWidget {
   final Exercise exercise;
 
-  const TimerExerciseView({super.key, required this.exercise});
+  const TimerExerciseDashboard({super.key, required this.exercise});
 
   @override
-  State<TimerExerciseView> createState() => _TimerExerciseViewState();
+  State<TimerExerciseDashboard> createState() => _TimerExerciseDashboardState();
 }
 
-class _TimerExerciseViewState extends State<TimerExerciseView>
+class _TimerExerciseDashboardState extends State<TimerExerciseDashboard>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   bool _isRunning = false;

@@ -18,6 +18,18 @@ double? trainingLoadForStrengthSet(double? weight, int? reps) {
   return weight * reps;
 }
 
+/// Sum of per-set training load (stored or derived from weight × reps).
+double totalTrainingLoadForSets(Iterable<SetEntry> sets) {
+  var total = 0.0;
+  for (final s in sets) {
+    final load = s.trainingLoad ?? trainingLoadForStrengthSet(s.weight, s.reps);
+    if (load != null) {
+      total += load;
+    }
+  }
+  return total;
+}
+
 class SetEntry {
   final int setNumber;
   final double? weight;

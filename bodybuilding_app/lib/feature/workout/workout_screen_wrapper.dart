@@ -4,8 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:bodybuilding_app/core/widgets/kinetic_app_bar.dart';
 import 'package:bodybuilding_app/feature/exercise/models/exercise.dart';
 import 'package:bodybuilding_app/feature/exercise/models/exercise_ui_mapper.dart';
-import 'package:bodybuilding_app/feature/exercise/widgets/strength_exercise_view.dart';
-import 'package:bodybuilding_app/feature/exercise/widgets/timer_exercise_view.dart';
+import 'package:bodybuilding_app/feature/workout/sub_screen/weight_exercise_dashboard.dart';
+import 'package:bodybuilding_app/feature/workout/sub_screen/timer_exercise_dashboard.dart';
 import 'package:bodybuilding_app/feature/routine/screens/edit_exercise_screen.dart';
 import 'package:bodybuilding_app/feature/workout/widgets/technique_notes_editor.dart';
 import 'package:bodybuilding_app/models/Exercise.dart' as amp;
@@ -13,10 +13,12 @@ import 'package:bodybuilding_app/models/RoutineExercise.dart';
 
 class ExerciseDetailScreen extends StatefulWidget {
   final Exercise exercise;
+
   /// Routine link when opened from a routine (enables edit/delete on workout page).
   final RoutineExercise? routineLink;
   final amp.Exercise? amplifyExercise;
   final String? routineName;
+
   /// Passed through [exerciseForWorkoutDetail] when refreshing after edit.
   final int listIndex;
 
@@ -47,8 +49,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
   }
 
   Future<void> _onTechniqueNotesPressed() async {
-    final ok =
-        await showTechniqueNotesEditor(context, _exercise.id);
+    final ok = await showTechniqueNotesEditor(context, _exercise.id);
     if (ok && mounted) {
       setState(() => _techniqueNotesRefreshToken++);
     }
@@ -113,10 +114,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         IconButton(
           tooltip: 'Edit exercise',
           onPressed: _openEditExercise,
-          icon: Icon(
-            Icons.edit_outlined,
-            color: cs.onSurface,
-          ),
+          icon: Icon(Icons.edit_outlined, color: cs.onSurface),
         ),
       );
     }
@@ -125,10 +123,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         IconButton(
           tooltip: 'Technique notes',
           onPressed: _onTechniqueNotesPressed,
-          icon: Icon(
-            Icons.edit_note,
-            color: cs.onSurface,
-          ),
+          icon: Icon(Icons.edit_note, color: cs.onSurface),
         ),
       );
     }
@@ -174,12 +169,12 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
 
           // Dynamic content based on exercise type
           if (exercise.isStrength)
-            StrengthExerciseView(
+            WeightExerciseDashboard(
               exercise: exercise,
               techniqueNotesRefreshToken: _techniqueNotesRefreshToken,
             )
           else
-            TimerExerciseView(exercise: exercise),
+            TimerExerciseDashboard(exercise: exercise),
         ],
       ),
     );

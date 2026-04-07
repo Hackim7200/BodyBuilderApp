@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class PerformanceArchive extends StatelessWidget {
+class ProgressGraph extends StatelessWidget {
   final String title;
   final String subtitle;
   final String currentValue;
@@ -10,7 +10,7 @@ class PerformanceArchive extends StatelessWidget {
   final List<double> series;
   final List<String> xLabels;
 
-  const PerformanceArchive({
+  const ProgressGraph({
     super.key,
     required this.title,
     required this.subtitle,

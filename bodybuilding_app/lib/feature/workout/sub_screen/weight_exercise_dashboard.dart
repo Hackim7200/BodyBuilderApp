@@ -4,11 +4,11 @@ import 'package:bodybuilding_app/core/utils/training_target_input.dart';
 import 'package:bodybuilding_app/feature/exercise/models/exercise.dart';
 import 'package:bodybuilding_app/feature/workout/data/session_sets_service.dart';
 import 'package:bodybuilding_app/feature/workout/models/workout_log.dart';
-import 'package:bodybuilding_app/feature/workout/widgets/session_log_table.dart';
+import 'package:bodybuilding_app/feature/workout/widgets/workout_table.dart';
+import 'package:bodybuilding_app/feature/workout/widgets/workout_detail_history_table.dart';
 import 'package:bodybuilding_app/feature/workout/widgets/technique_notes_card.dart';
-import 'package:bodybuilding_app/feature/workout/widgets/performance_archive.dart';
-import 'package:bodybuilding_app/feature/workout/widgets/stat_card.dart';
-import 'package:bodybuilding_app/app/themes/app_theme.dart';
+import 'package:bodybuilding_app/feature/workout/widgets/progress_graph.dart';
+import 'package:bodybuilding_app/feature/workout/widgets/small_stat_card.dart';
 
 bool _strengthSetHasValues(SetEntry s) {
   final w = s.weight;
@@ -39,22 +39,24 @@ bool _strengthSessionLooksComplete(List<SetEntry> sets, int maxSets) {
 /// Strength session grid: one editable row at a time (the latest set).
 /// Enter weight and reps, tap **ADD SET** to lock that row and open the next;
 /// on the last target set, tap **FINISH WORKOUT** to lock the table.
-class StrengthExerciseView extends StatefulWidget {
+class WeightExerciseDashboard extends StatefulWidget {
   final Exercise exercise;
+
   /// Bumps [TechniqueNotesCard] key so saved notes refetch from DataStore.
   final int techniqueNotesRefreshToken;
 
-  const StrengthExerciseView({
+  const WeightExerciseDashboard({
     super.key,
     required this.exercise,
     this.techniqueNotesRefreshToken = 0,
   });
 
   @override
-  State<StrengthExerciseView> createState() => _StrengthExerciseViewState();
+  State<WeightExerciseDashboard> createState() =>
+      _WeightExerciseDashboardState();
 }
 
-class _StrengthExerciseViewState extends State<StrengthExerciseView> {
+class _WeightExerciseDashboardState extends State<WeightExerciseDashboard> {
   late List<SetEntry> _sets;
   bool _workoutFinished = false;
   bool _sessionReady = true;
@@ -62,6 +64,7 @@ class _StrengthExerciseViewState extends State<StrengthExerciseView> {
   String? _workoutLogId;
   List<double> _trainingLoadSeries = [];
   List<String> _trainingLoadLabels = [];
+  List<WorkoutLog> _historySessions = [];
   final SessionSetsService _sessionSetsService = SessionSetsService();
   final GlobalKey<SessionLogTableState> _sessionTableKey =
       GlobalKey<SessionLogTableState>();
@@ -99,16 +102,21 @@ class _StrengthExerciseViewState extends State<StrengthExerciseView> {
 
   Future<void> _loadTrainingLoadHistory(String routineExerciseId) async {
     try {
-      final points = await _sessionSetsService.lastWorkoutsTrainingLoad(
+      final sessions = await _sessionSetsService.recentWorkoutsWithSets(
         routineExerciseId,
-        limit: 7,
+        limit: 20,
       );
       if (!mounted) return;
+      final graphSlice = sessions.length > 7
+          ? sessions.sublist(sessions.length - 7)
+          : sessions;
       setState(() {
-        _trainingLoadSeries =
-            points.map((p) => p.totalTrainingLoad).toList();
-        _trainingLoadLabels = points
-            .map((p) => '${p.date.month}/${p.date.day}')
+        _historySessions = sessions;
+        _trainingLoadSeries = graphSlice
+            .map((w) => totalTrainingLoadForSets(w.sets))
+            .toList();
+        _trainingLoadLabels = graphSlice
+            .map((w) => '${w.date.month}/${w.date.day}')
             .toList();
       });
     } catch (e, st) {
@@ -126,7 +134,9 @@ class _StrengthExerciseViewState extends State<StrengthExerciseView> {
 
   Future<void> _loadPersistedSession(String routineExerciseId) async {
     try {
-      final log = await _sessionSetsService.getOrCreateTodaysLog(routineExerciseId);
+      final log = await _sessionSetsService.getOrCreateTodaysLog(
+        routineExerciseId,
+      );
       final loaded = await _sessionSetsService.loadSets(log.id);
       if (!mounted) return;
       setState(() {
@@ -148,11 +158,14 @@ class _StrengthExerciseViewState extends State<StrengthExerciseView> {
   void _persistSetRow(int index, SetEntry entry) {
     final logId = _workoutLogId;
     if (logId == null) return;
-    _sessionSetsService.persistSet(logId, entry).then((updated) {
-      if (mounted) setState(() => _sets[index] = updated);
-    }).catchError((Object e, StackTrace st) {
-      safePrint('SessionSetsService persist failed: $e $st');
-    });
+    _sessionSetsService
+        .persistSet(logId, entry)
+        .then((updated) {
+          if (mounted) setState(() => _sets[index] = updated);
+        })
+        .catchError((Object e, StackTrace st) {
+          safePrint('SessionSetsService persist failed: $e $st');
+        });
   }
 
   void _onPrimaryAction() {
@@ -204,22 +217,27 @@ class _StrengthExerciseViewState extends State<StrengthExerciseView> {
       refreshHistory();
       return;
     }
-    _sessionSetsService.persistSet(logId, lastEntry).then((saved) {
-      if (mounted) {
-        setState(() => _sets[lastIndex] = saved);
-        refreshHistory();
-      }
-    }).catchError((Object e, StackTrace st) {
-      safePrint('SessionSetsService finish persist failed: $e $st');
-      refreshHistory();
-    });
+    _sessionSetsService
+        .persistSet(logId, lastEntry)
+        .then((saved) {
+          if (mounted) {
+            setState(() => _sets[lastIndex] = saved);
+            refreshHistory();
+          }
+        })
+        .catchError((Object e, StackTrace st) {
+          safePrint('SessionSetsService finish persist failed: $e $st');
+          refreshHistory();
+        });
   }
 
   Future<void> _persistAndAddSet(String logId, int nextNumber) async {
     try {
       final lastIndex = _sets.length - 1;
-      final savedLast =
-          await _sessionSetsService.persistSet(logId, _sets[lastIndex]);
+      final savedLast = await _sessionSetsService.persistSet(
+        logId,
+        _sets[lastIndex],
+      );
       if (!mounted) return;
       setState(() => _sets[lastIndex] = savedLast);
       final newRow = await _sessionSetsService.persistSet(
@@ -258,18 +276,20 @@ class _StrengthExerciseViewState extends State<StrengthExerciseView> {
           },
           primaryButtonEnabled:
               _sessionReady && _lastRowComplete && !_addingSet,
-          onPrimaryAction:
-              !_sessionReady || _workoutFinished ? null : _onPrimaryAction,
+          onPrimaryAction: !_sessionReady || _workoutFinished
+              ? null
+              : _onPrimaryAction,
         ),
         const SizedBox(height: 24),
-        PerformanceArchive(
-          title: 'Load progression',
-          subtitle: 'Total volume per session · last 7 workouts',
+        ProgressGraph(
+          title: 'PROGRESS',
+          subtitle: '· last 7 workouts',
           currentValue: _latestTrainingLoadDisplay,
           unit: 'kg×reps',
           series: _trainingLoadSeries,
           xLabels: _trainingLoadLabels,
         ),
+
         const SizedBox(height: 24),
         Row(
           children: [
@@ -278,21 +298,22 @@ class _StrengthExerciseViewState extends State<StrengthExerciseView> {
                 label: '1-REP MAX',
                 value: '125',
                 unit: 'KG',
-                sublabel: 'Estimated Peak',
+                sublabel: 'Current Peak',
               ),
             ),
             const SizedBox(width: 24),
             Expanded(
               child: StatCard(
                 label: 'PERCENTAGE INCREASE',
-                value: '+5.2%',
+                value: '+5.2',
+                unit: '%',
                 sublabel: 'Since Last Month',
-                icon: Icons.trending_up,
-                iconColor: AppTheme.success,
               ),
             ),
           ],
         ),
+        const SizedBox(height: 24),
+        WorkoutDetailHistoryTable(sessions: _historySessions),
       ],
     );
   }

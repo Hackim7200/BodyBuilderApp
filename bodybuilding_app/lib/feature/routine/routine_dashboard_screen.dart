@@ -9,7 +9,7 @@ import 'package:bodybuilding_app/models/RoutineExercise.dart';
 import 'package:bodybuilding_app/models/routine.dart';
 import 'package:bodybuilding_app/feature/routine/widgets/routine_card.dart';
 import 'package:bodybuilding_app/feature/routine/widgets/create_routine_card.dart';
-import 'package:bodybuilding_app/feature/exercise/screens/exercise_dashboard_screen.dart';
+import 'package:bodybuilding_app/feature/exercise/exercise_dashboard_screen.dart';
 import 'package:bodybuilding_app/feature/routine/screens/create_routine_screen.dart';
 
 class RoutineDashboardScreen extends StatefulWidget {

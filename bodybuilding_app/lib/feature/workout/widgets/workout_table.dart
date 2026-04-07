@@ -60,9 +60,7 @@ class SessionLogTableState extends State<SessionLogTable> {
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: cs.surfaceContainerLowest,
-        border: Border.all(
-          color: cs.outlineVariant.withValues(alpha: 0.3),
-        ),
+        border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.3)),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Column(
@@ -74,12 +72,11 @@ class SessionLogTableState extends State<SessionLogTable> {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [
-                  cs.surfaceContainerHigh,
-                  cs.surfaceContainerHighest,
-                ],
+                colors: [cs.surfaceContainerHigh, cs.surfaceContainerHighest],
               ),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(4),
+              ),
               border: Border(
                 bottom: BorderSide(
                   color: cs.outlineVariant.withValues(alpha: 0.35),
@@ -93,17 +90,14 @@ class SessionLogTableState extends State<SessionLogTable> {
                   SizedBox(
                     width: _setColWidth,
                     child: Center(
-                      child: Text(
-                        'SET',
-                        style: _columnHeaderStyle(cs),
-                      ),
+                      child: Text('SET', style: _columnHeaderStyle(cs)),
                     ),
                   ),
                   _ColumnSeparator(colorScheme: cs),
                   Expanded(
                     child: Center(
                       child: Text(
-                        'WEIGHT (KG)',
+                        'WEIGHT',
                         style: _columnHeaderStyle(cs),
                         textAlign: TextAlign.center,
                       ),
@@ -226,9 +220,7 @@ class _ReadOnlyLogSetRow extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
       decoration: BoxDecoration(
         border: Border(
-          bottom: BorderSide(
-            color: cs.outlineVariant.withValues(alpha: 0.1),
-          ),
+          bottom: BorderSide(color: cs.outlineVariant.withValues(alpha: 0.1)),
         ),
       ),
       child: IntrinsicHeight(
@@ -391,7 +383,9 @@ class _EditableLogSetRowState extends State<_EditableLogSetRow> {
       if (parsed == null ||
           parsed < TrainingTargetInput.minReps ||
           parsed > TrainingTargetInput.maxReps) {
-        _repsCtrl.text = widget.entry.reps != null ? '${widget.entry.reps}' : '';
+        _repsCtrl.text = widget.entry.reps != null
+            ? '${widget.entry.reps}'
+            : '';
         r = widget.entry.reps;
       } else {
         r = parsed;
@@ -444,9 +438,7 @@ class _EditableLogSetRowState extends State<_EditableLogSetRow> {
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
       decoration: BoxDecoration(
         border: Border(
-          bottom: BorderSide(
-            color: cs.outlineVariant.withValues(alpha: 0.1),
-          ),
+          bottom: BorderSide(color: cs.outlineVariant.withValues(alpha: 0.1)),
         ),
       ),
       child: IntrinsicHeight(

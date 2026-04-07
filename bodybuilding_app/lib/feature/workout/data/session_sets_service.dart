@@ -99,6 +99,25 @@ class SessionSetsService {
     String routineExerciseId, {
     int limit = 7,
   }) async {
+    final withSets = await recentWorkoutsWithSets(
+      routineExerciseId,
+      limit: limit,
+    );
+    return withSets
+        .map(
+          (w) => WorkoutTrainingLoadPoint(
+            date: w.date,
+            totalTrainingLoad: session.totalTrainingLoadForSets(w.sets),
+          ),
+        )
+        .toList();
+  }
+
+  /// Recent [WorkoutLog] sessions with strength sets loaded, oldest first.
+  Future<List<session.WorkoutLog>> recentWorkoutsWithSets(
+    String routineExerciseId, {
+    int limit = 20,
+  }) async {
     final logs = await Amplify.DataStore.query(
       ds.WorkoutLog.classType,
       where: ds.WorkoutLog.ROUTINEEXERCISEID.eq(routineExerciseId),
@@ -109,21 +128,15 @@ class SessionSetsService {
     final selected = logs.take(limit).toList()
       ..sort((a, b) => a.date.compareTo(b.date));
 
-    final out = <WorkoutTrainingLoadPoint>[];
+    final out = <session.WorkoutLog>[];
     for (final log in selected) {
       final sets = await loadSets(log.id);
-      var total = 0.0;
-      for (final s in sets) {
-        final load =
-            s.trainingLoad ?? session.trainingLoadForStrengthSet(s.weight, s.reps);
-        if (load != null) {
-          total += load;
-        }
-      }
       out.add(
-        WorkoutTrainingLoadPoint(
+        session.WorkoutLog(
+          id: log.id,
+          exerciseId: routineExerciseId,
           date: log.date.getDateTimeInUtc().toLocal(),
-          totalTrainingLoad: total,
+          sets: sets,
         ),
       );
     }

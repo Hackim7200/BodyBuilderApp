@@ -6,7 +6,7 @@ import 'package:bodybuilding_app/feature/routine/data/routine_exercise_service.d
 import 'package:bodybuilding_app/feature/exercise/models/exercise_ui_mapper.dart';
 import 'package:bodybuilding_app/feature/routine/screens/add_exercise_screen.dart';
 import 'package:bodybuilding_app/feature/routine/screens/edit_routine_screen.dart';
-import 'package:bodybuilding_app/feature/workout/exercise_detail_screen.dart';
+import 'package:bodybuilding_app/feature/workout/workout_screen_wrapper.dart';
 import 'package:bodybuilding_app/models/Exercise.dart';
 import 'package:bodybuilding_app/models/RoutineExercise.dart';
 import 'package:bodybuilding_app/models/routine.dart';
