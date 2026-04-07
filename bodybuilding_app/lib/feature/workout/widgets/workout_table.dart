@@ -130,7 +130,8 @@ class SessionLogTableState extends State<SessionLogTable> {
               );
             }
             return _ReadOnlyLogSetRow(
-              key: ValueKey('ro_${e.value.setNumber}'),
+              // Index (not setNumber) so duplicate set indices in the list cannot clash.
+              key: ValueKey('ro_${e.key}'),
               entry: e.value,
             );
           }),

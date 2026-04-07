@@ -1,5 +1,6 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:bodybuilding_app/feature/workout/models/workout_log.dart' as session;
+import 'package:bodybuilding_app/feature/workout/models/workout_log.dart'
+    as session;
 import 'package:bodybuilding_app/models/SetEntry.dart' as ds;
 import 'package:bodybuilding_app/models/WorkoutLog.dart' as ds;
 
@@ -62,8 +63,8 @@ class SessionSetsService {
   }
 
   session.SetEntry _fromDatastore(ds.SetEntry m) {
-    final load = m.trainingLoad ??
-        session.trainingLoadForStrengthSet(m.weight, m.reps);
+    final load =
+        m.trainingLoad ?? session.trainingLoadForStrengthSet(m.weight, m.reps);
     return session.SetEntry(
       setNumber: m.setNumber,
       weight: m.weight,
@@ -71,6 +72,22 @@ class SessionSetsService {
       isCompleted: m.isCompleted ?? false,
       trainingLoad: load,
       datastoreId: m.id,
+    );
+  }
+
+  /// Writes the session total (Σ per-set training load) on [WorkoutLog] when the workout is finished.
+  Future<void> saveWorkoutLogTotalTrainingLoad(
+    String workoutLogId,
+    List<session.SetEntry> sets,
+  ) async {
+    final total = session.totalTrainingLoadForSets(sets);
+    final rows = await Amplify.DataStore.query(
+      ds.WorkoutLog.classType,
+      where: ds.WorkoutLog.ID.eq(workoutLogId),
+    );
+    if (rows.isEmpty) return;
+    await Amplify.DataStore.save(
+      rows.first.copyWith(totalTrainingLoad: total),
     );
   }
 

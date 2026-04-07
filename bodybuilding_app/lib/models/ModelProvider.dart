@@ -28,6 +28,7 @@ import 'RoutineExercise.dart';
 import 'SetEntry.dart';
 import 'WorkoutLog.dart';
 
+export 'model_field_value.dart';
 export 'Circuit.dart';
 export 'CircuitExercise.dart';
 export 'Exercise.dart';
@@ -37,8 +38,9 @@ export 'SetEntry.dart';
 export 'WorkoutLog.dart';
 
 class ModelProvider implements amplify_core.ModelProviderInterface {
+  /// Bump when any [modelSchemas] shape changes so local SQLite can migrate.
   @override
-  String version = "bf2a9c1d4e6b7a8091c2d3e4f5a6b7c9a";
+  String version = "d8e2f1a0c4b3567890abcdef1234567890";
   @override
   List<amplify_core.ModelSchema> modelSchemas = [
     Circuit.schema,
@@ -77,9 +79,3 @@ class ModelProvider implements amplify_core.ModelProviderInterface {
   }
 }
 
-
-class ModelFieldValue<T> {
-  const ModelFieldValue.value(this.value);
-
-  final T value;
-}

@@ -142,7 +142,15 @@ class _WeightExerciseDashboardState extends State<WeightExerciseDashboard> {
       setState(() {
         _workoutLogId = log.id;
         if (loaded.isNotEmpty) {
-          _sets = loaded;
+          final stillPristineFirstRow =
+              _sets.length == 1 &&
+              _sets.single.setNumber == 1 &&
+              _sets.single.datastoreId == null &&
+              _sets.single.weight == null &&
+              _sets.single.reps == null;
+          if (stillPristineFirstRow) {
+            _sets = loaded;
+          }
         }
         _workoutFinished = _strengthSessionLooksComplete(_sets, _maxSets);
         _sessionReady = true;
@@ -219,11 +227,20 @@ class _WeightExerciseDashboardState extends State<WeightExerciseDashboard> {
     }
     _sessionSetsService
         .persistSet(logId, lastEntry)
-        .then((saved) {
-          if (mounted) {
-            setState(() => _sets[lastIndex] = saved);
-            refreshHistory();
+        .then((saved) async {
+          if (!mounted) return;
+          final updatedSets = List<SetEntry>.from(_sets);
+          updatedSets[lastIndex] = saved;
+          setState(() => _sets[lastIndex] = saved);
+          try {
+            await _sessionSetsService.saveWorkoutLogTotalTrainingLoad(
+              logId,
+              updatedSets,
+            );
+          } catch (e, st) {
+            safePrint('SessionSetsService total load save failed: $e $st');
           }
+          if (mounted) refreshHistory();
         })
         .catchError((Object e, StackTrace st) {
           safePrint('SessionSetsService finish persist failed: $e $st');
@@ -267,7 +284,9 @@ class _WeightExerciseDashboardState extends State<WeightExerciseDashboard> {
         SessionLogTable(
           key: _sessionTableKey,
           sets: _sets,
-          editableRowIndex: _sessionReady ? _editableRowIndex : null,
+          // Keep the active row editable while the log loads; values were
+          // showing as "--" for the whole session when this was tied to [_sessionReady].
+          editableRowIndex: _editableRowIndex,
           workoutFinished: _workoutFinished,
           maxSets: _maxSets,
           onSetCommitted: (index, entry) {

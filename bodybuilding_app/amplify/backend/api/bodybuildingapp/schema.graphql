@@ -1,7 +1,8 @@
 # This "input" configures a global authorization rule to enable public access to
 # all models in this schema. Learn more about authorization rules here: https://docs.amplify.aws/cli/graphql/authorization-rules
-input AMPLIFY { globalAuthRule: AuthRule = { allow: public } } # FOR TESTING ONLY!
-
+input AMPLIFY {
+  globalAuthRule: AuthRule = { allow: public }
+} # FOR TESTING ONLY!
 type Routine @model {
   id: ID!
   name: String!
@@ -50,6 +51,8 @@ type WorkoutLog @model {
   routineExerciseId: ID!
   date: AWSDateTime!
   notes: String
+  trainingLoadChangePercent: Float
+  totalTrainingLoad: Float
 }
 
 # Each workout log has many set entries (e.g. 4 sets → 4 SetEntry rows).
@@ -64,6 +67,3 @@ type SetEntry @model {
   durationSeconds: Int
   isCompleted: Boolean
 }
-
-
-
