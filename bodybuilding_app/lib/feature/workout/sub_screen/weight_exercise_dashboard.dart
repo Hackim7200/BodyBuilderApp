@@ -65,6 +65,7 @@ class _WeightExerciseDashboardState extends State<WeightExerciseDashboard> {
   List<double> _trainingLoadSeries = [];
   List<String> _trainingLoadLabels = [];
   List<WorkoutLog> _historySessions = [];
+  double? _maxWeightLast30Days;
   final SessionSetsService _sessionSetsService = SessionSetsService();
   final GlobalKey<SessionLogTableState> _sessionTableKey =
       GlobalKey<SessionLogTableState>();
@@ -106,12 +107,17 @@ class _WeightExerciseDashboardState extends State<WeightExerciseDashboard> {
         routineExerciseId,
         limit: 20,
       );
+      final maxWeight = await _sessionSetsService.maxStrengthWeightLastDays(
+        routineExerciseId,
+        days: 30,
+      );
       if (!mounted) return;
       final graphSlice = sessions.length > 7
           ? sessions.sublist(sessions.length - 7)
           : sessions;
       setState(() {
         _historySessions = sessions;
+        _maxWeightLast30Days = maxWeight;
         _trainingLoadSeries = graphSlice
             .map((w) => totalTrainingLoadForSets(w.sets))
             .toList();
@@ -124,9 +130,17 @@ class _WeightExerciseDashboardState extends State<WeightExerciseDashboard> {
     }
   }
 
-  String get _latestTrainingLoadDisplay {
-    if (_trainingLoadSeries.isEmpty) return '—';
-    final v = _trainingLoadSeries.last;
+  String get _todaysTrainingLoadDisplay {
+    final v = totalTrainingLoadForSets(_sets);
+    if (v <= 0) return '—';
+    if (v >= 1000) return v.round().toString();
+    if (v == v.roundToDouble()) return v.round().toString();
+    return v.toStringAsFixed(1);
+  }
+
+  String get _maxWeightLast30DaysDisplay {
+    final v = _maxWeightLast30Days;
+    if (v == null) return '—';
     if (v >= 1000) return v.round().toString();
     if (v == v.roundToDouble()) return v.round().toString();
     return v.toStringAsFixed(1);
@@ -147,7 +161,10 @@ class _WeightExerciseDashboardState extends State<WeightExerciseDashboard> {
         .toList();
     final prev = totals[totals.length - 2];
     final cur = totals[totals.length - 1];
-    final pct = SessionSetsService.trainingLoadChangePercentVsPrevious(cur, prev);
+    final pct = SessionSetsService.trainingLoadChangePercentVsPrevious(
+      cur,
+      prev,
+    );
     if (pct == null) return '—';
     final sign = pct > 0 ? '+' : '';
     return '$sign${pct.toStringAsFixed(1)}';
@@ -333,21 +350,21 @@ class _WeightExerciseDashboardState extends State<WeightExerciseDashboard> {
         const SizedBox(height: 24),
         Row(
           children: [
-            const Expanded(
+            Expanded(
               child: StatCard(
-                label: '1-REP MAX',
-                value: '125',
+                label: 'MAX WEIGHT',
+                value: _maxWeightLast30DaysDisplay,
                 unit: 'KG',
-                sublabel: 'Current Peak',
+                sublabel: 'last 30 days',
               ),
             ),
             const SizedBox(width: 24),
             Expanded(
               child: StatCard(
                 label: 'TRAINING LOAD',
-                value: _latestTrainingLoadDisplay,
-                unit: 'kg×reps',
-                sublabel: 'Since Last Month',
+                value: _todaysTrainingLoadDisplay,
+                // unit: 'kg×rep',
+                sublabel: 'today',
               ),
             ),
           ],

@@ -17,9 +17,11 @@ class _CreateCircuitScreenState extends State<CreateCircuitScreen> {
   final _descriptionController = TextEditingController();
   final _roundsController = TextEditingController();
   final _stationSecondsController = TextEditingController();
+  final _preStartCountdownController = TextEditingController(text: '10');
+  final _restBetweenRoundsController = TextEditingController(text: '30');
   final _service = CircuitService();
   bool _saving = false;
-  /// false = follow exercise list order; true = shuffle once when Play starts.
+  /// false = follow list order; true = shuffle stations once when Play starts.
   bool _randomizeStationOrder = false;
 
   @override
@@ -28,6 +30,8 @@ class _CreateCircuitScreenState extends State<CreateCircuitScreen> {
     _descriptionController.dispose();
     _roundsController.dispose();
     _stationSecondsController.dispose();
+    _preStartCountdownController.dispose();
+    _restBetweenRoundsController.dispose();
     super.dispose();
   }
 
@@ -44,10 +48,14 @@ class _CreateCircuitScreenState extends State<CreateCircuitScreen> {
     if (name.isEmpty) return;
 
     final rounds = _parseOptionalPositiveInt(_roundsController.text);
-    if (_roundsController.text.trim().isNotEmpty && rounds == null) {
+    if (rounds == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Rounds must be a positive number.')),
+          const SnackBar(
+            content: Text(
+              'Rounds is required: enter a positive number.',
+            ),
+          ),
         );
       }
       return;
@@ -60,7 +68,40 @@ class _CreateCircuitScreenState extends State<CreateCircuitScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-              'Station duration is required: enter seconds between 1 and 3600 (same for every exercise).',
+              'Exercise duration is required: enter seconds between 1 and 3600 (same for every exercise).',
+            ),
+          ),
+        );
+      }
+      return;
+    }
+
+    final preStartRaw = _preStartCountdownController.text.trim();
+    final preStartSec = int.tryParse(preStartRaw);
+    if (preStartRaw.isEmpty ||
+        preStartSec == null ||
+        preStartSec < 0 ||
+        preStartSec > 300) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Starting countdown: enter 0–300 seconds (0 = skip, starts work immediately).',
+            ),
+          ),
+        );
+      }
+      return;
+    }
+
+    final restRaw = _restBetweenRoundsController.text.trim();
+    final restSec = int.tryParse(restRaw);
+    if (restRaw.isEmpty || restSec == null || restSec < 1 || restSec > 3600) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Rest between rounds is required: enter seconds between 1 and 3600.',
             ),
           ),
         );
@@ -77,6 +118,8 @@ class _CreateCircuitScreenState extends State<CreateCircuitScreen> {
         description: desc.isEmpty ? null : desc,
         rounds: rounds,
         stationDurationSeconds: stationSec,
+        preStartCountdownSeconds: preStartSec,
+        restBetweenRoundsSeconds: restSec,
         randomizeStationOrder: _randomizeStationOrder,
       );
       await _service.saveCircuit(circuit);
@@ -128,13 +171,13 @@ class _CreateCircuitScreenState extends State<CreateCircuitScreen> {
           _buildField('CIRCUIT NAME', 'e.g. HIIT Blast', _nameController),
           const SizedBox(height: 32),
           _buildField(
-            'DESCRIPTION',
+            'DESCRIPTION (OPTIONAL)',
             'e.g. Metabolic conditioning',
             _descriptionController,
           ),
           const SizedBox(height: 32),
           _buildField(
-            'ROUNDS (OPTIONAL)',
+            'ROUNDS',
             'e.g. 3',
             _roundsController,
             keyboardType: TextInputType.number,
@@ -142,9 +185,25 @@ class _CreateCircuitScreenState extends State<CreateCircuitScreen> {
           ),
           const SizedBox(height: 32),
           _buildField(
-            'STATION DURATION (SECONDS)',
+            'EXERCISE DURATION (SECONDS)',
             'e.g. 45 — same for every exercise',
             _stationSecondsController,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          ),
+          const SizedBox(height: 32),
+          _buildField(
+            'STARTING COUNTDOWN (SECONDS)',
+            'e.g. 10 — before first exercise; use 0 to skip',
+            _preStartCountdownController,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          ),
+          const SizedBox(height: 32),
+          _buildField(
+            'REST BETWEEN ROUNDS (SECONDS)',
+            'e.g. 30 — after each full lap when more than one round',
+            _restBetweenRoundsController,
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           ),
@@ -204,7 +263,7 @@ class _CreateCircuitScreenState extends State<CreateCircuitScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'STATION ORDER',
+          'EXERCISE ORDER',
           style: GoogleFonts.inter(
             fontSize: 10,
             fontWeight: FontWeight.w700,
@@ -214,7 +273,7 @@ class _CreateCircuitScreenState extends State<CreateCircuitScreen> {
         ),
         const SizedBox(height: 8),
         Text(
-          'Sequential uses your list order. Random shuffles stations once each time you open Play.',
+          'Sequential uses your list order. Random shuffles exercises once each time you open Play.',
           style: GoogleFonts.inter(
             fontSize: 13,
             fontWeight: FontWeight.w400,
@@ -281,7 +340,7 @@ class _CreateCircuitScreenState extends State<CreateCircuitScreen> {
         ),
         const SizedBox(height: 8),
         Text(
-          'After you create this circuit, open it and add exercises. Each station uses the duration you set above.',
+          'After you create this circuit, open it and add exercises. Each exercise uses the work duration above; rest applies between rounds only.',
           style: GoogleFonts.inter(
             fontSize: 13,
             fontWeight: FontWeight.w400,

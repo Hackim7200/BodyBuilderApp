@@ -71,6 +71,7 @@ class SessionSetsService {
       reps: m.reps,
       isCompleted: m.isCompleted ?? false,
       trainingLoad: load,
+      durationSeconds: m.durationSeconds,
       datastoreId: m.id,
     );
   }
@@ -80,7 +81,7 @@ class SessionSetsService {
     final stored = log.totalTrainingLoad;
     if (stored != null) return stored;
     final sets = await loadSets(log.id);
-    return session.totalTrainingLoadForSets(sets);
+    return session.aggregateMetricForWorkoutLogSets(sets);
   }
 
   /// Percent change vs chronologically previous session: `((current − previous) / previous) × 100`.
@@ -126,7 +127,7 @@ class SessionSetsService {
     String workoutLogId,
     List<session.SetEntry> sets,
   ) async {
-    final total = session.totalTrainingLoadForSets(sets);
+    final total = session.aggregateMetricForWorkoutLogSets(sets);
     final rows = await Amplify.DataStore.query(
       ds.WorkoutLog.classType,
       where: ds.WorkoutLog.ID.eq(workoutLogId),
@@ -170,6 +171,7 @@ class SessionSetsService {
       weight: entry.weight,
       reps: entry.reps,
       trainingLoad: load,
+      durationSeconds: entry.durationSeconds,
       isCompleted: entry.isCompleted,
     );
     await Amplify.DataStore.save(m);
@@ -226,5 +228,61 @@ class SessionSetsService {
       );
     }
     return out;
+  }
+
+  /// Heaviest valid strength set (weight with reps in app ranges) across all
+  /// logs for this exercise whose session date falls within the last [days]
+  /// (rolling, local time).
+  Future<double?> maxStrengthWeightLastDays(
+    String routineExerciseId, {
+    int days = 30,
+  }) async {
+    final logs = await Amplify.DataStore.query(
+      ds.WorkoutLog.classType,
+      where: ds.WorkoutLog.ROUTINEEXERCISEID.eq(routineExerciseId),
+    );
+    if (logs.isEmpty) return null;
+    final cutoff = DateTime.now().subtract(Duration(days: days));
+    double? best;
+    for (final log in logs) {
+      final local = log.date.getDateTimeInUtc().toLocal();
+      if (local.isBefore(cutoff)) continue;
+      final sets = await loadSets(log.id);
+      for (final s in sets) {
+        if (session.trainingLoadForStrengthSet(s.weight, s.reps) == null) {
+          continue;
+        }
+        final w = s.weight!;
+        if (best == null || w > best) best = w;
+      }
+    }
+    return best;
+  }
+
+  /// Longest single timed hold ([SetEntry.durationSeconds]) across all logs
+  /// for this exercise whose session date falls within the last [days]
+  /// (rolling, local time).
+  Future<int?> maxTimerHoldSecondsLastDays(
+    String routineExerciseId, {
+    int days = 30,
+  }) async {
+    final logs = await Amplify.DataStore.query(
+      ds.WorkoutLog.classType,
+      where: ds.WorkoutLog.ROUTINEEXERCISEID.eq(routineExerciseId),
+    );
+    if (logs.isEmpty) return null;
+    final cutoff = DateTime.now().subtract(Duration(days: days));
+    int? best;
+    for (final log in logs) {
+      final local = log.date.getDateTimeInUtc().toLocal();
+      if (local.isBefore(cutoff)) continue;
+      final sets = await loadSets(log.id);
+      for (final s in sets) {
+        final d = s.durationSeconds;
+        if (d == null || d < 1) continue;
+        if (best == null || d > best) best = d;
+      }
+    }
+    return best;
   }
 }

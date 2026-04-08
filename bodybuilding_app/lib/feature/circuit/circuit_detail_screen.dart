@@ -38,9 +38,7 @@ class _CircuitDetailScreenState extends State<CircuitDetailScreen> {
 
   Future<void> _openEdit() async {
     final updated = await Navigator.of(context).push<Circuit>(
-      MaterialPageRoute(
-        builder: (_) => EditCircuitScreen(circuit: _circuit),
-      ),
+      MaterialPageRoute(builder: (_) => EditCircuitScreen(circuit: _circuit)),
     );
     if (updated != null && mounted) setState(() => _circuit = updated);
   }
@@ -84,7 +82,7 @@ class _CircuitDetailScreenState extends State<CircuitDetailScreen> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(24, 8, 24, 120),
         children: [
-          _CircuitHeroHeader(circuit: _circuit, linkService: _linkService),
+          _CircuitHeroHeader(circuit: _circuit),
           const SizedBox(height: 40),
           _CircuitExerciseList(
             circuitId: _circuit.id,
@@ -108,12 +106,8 @@ class _CircuitDetailScreenState extends State<CircuitDetailScreen> {
 
 class _CircuitHeroHeader extends StatelessWidget {
   final Circuit circuit;
-  final CircuitExerciseService linkService;
 
-  const _CircuitHeroHeader({
-    required this.circuit,
-    required this.linkService,
-  });
+  const _CircuitHeroHeader({required this.circuit});
 
   @override
   Widget build(BuildContext context) {
@@ -121,8 +115,17 @@ class _CircuitHeroHeader extends StatelessWidget {
     final roundsLabel = circuit.rounds?.toString() ?? '—';
     final sec = circuit.stationDurationSeconds;
     final durationLabel = sec != null ? '$sec SEC' : '—';
-    final orderLabel =
-        circuit.randomizeStationOrder == true ? 'RANDOM' : 'LIST';
+    final preStartSec = circuit.preStartCountdownSeconds;
+    final preStartLabel = preStartSec == null
+        ? '—'
+        : preStartSec == 0
+        ? 'OFF'
+        : '$preStartSec SEC';
+    final restSec = circuit.restBetweenRoundsSeconds;
+    final restLabel = restSec != null ? '$restSec SEC' : '—';
+    final orderLabel = circuit.randomizeStationOrder == true
+        ? 'RANDOM'
+        : 'LIST';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -148,45 +151,50 @@ class _CircuitHeroHeader extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        StreamBuilder<QuerySnapshot<CircuitExercise>>(
-          stream: linkService.observeForCircuit(circuit.id),
-          builder: (context, snapshot) {
-            final n = snapshot.hasData ? snapshot.data!.items.length : 0;
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    _MetricPill(label: 'STATIONS', value: '$n'),
-                    Container(
-                      width: 1,
-                      height: 32,
-                      margin: const EdgeInsets.symmetric(horizontal: 24),
-                      color: cs.surfaceContainerHighest,
-                    ),
-                    _MetricPill(label: 'ROUNDS', value: roundsLabel),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    _MetricPill(
-                      label: 'EACH STATION',
-                      value: durationLabel,
-                    ),
-                    Container(
-                      width: 1,
-                      height: 32,
-                      margin: const EdgeInsets.symmetric(horizontal: 24),
-                      color: cs.surfaceContainerHighest,
-                    ),
-                    _MetricPill(label: 'ORDER', value: orderLabel),
-                  ],
-                ),
-              ],
-            );
-          },
+        _CircuitHeroHeader._metricsRow(
+          cs,
+          left: _MetricPill(label: 'ROUNDS', value: roundsLabel),
+          right: _MetricPill(label: 'ORDER', value: orderLabel),
         ),
+        const SizedBox(height: 12),
+        _CircuitHeroHeader._metricsRow(
+          cs,
+          left: _MetricPill(label: 'COUNTDOWN', value: preStartLabel),
+          right:         _MetricPill(label: 'REST', value: restLabel),
+        ),
+        const SizedBox(height: 12),
+        _CircuitHeroHeader._metricsRow(
+          cs,
+          left: _MetricPill(label: 'EACH EXERCISE', value: durationLabel),
+  
+          right: const SizedBox.shrink(),
+          showCenterRule: false,
+        ),
+      ],
+    );
+  }
+
+  /// Two equal columns; optional vertical rule (same width as rule + margins when off).
+  static Widget _metricsRow(
+    ColorScheme cs, {
+    required Widget left,
+    required Widget right,
+    bool showCenterRule = true,
+  }) {
+    final gutter = showCenterRule
+        ? Container(
+            width: 1,
+            height: 32,
+            margin: const EdgeInsets.symmetric(horizontal: 24),
+            color: cs.surfaceContainerHighest,
+          )
+        : const SizedBox(width: 49);
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(child: left),
+        gutter,
+        Expanded(child: right),
       ],
     );
   }

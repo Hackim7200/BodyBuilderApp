@@ -5,7 +5,7 @@ import 'package:bodybuilding_app/app/navigation/main_shell.dart';
 import 'package:bodybuilding_app/feature/auth/screens/onboarding_screen.dart';
 import 'package:bodybuilding_app/feature/auth/screens/sign_in_screen.dart';
 
-/// Global [GoRouter] for the app.
+/// Builds the app [GoRouter] (initial route depends on onboarding completion).
 ///
 /// **Optional auth:** users can use [MainShell] at `/home` without signing in.
 /// Sign-in exists for sync (and similar) when the backend is wired — keep the
@@ -14,32 +14,34 @@ import 'package:bodybuilding_app/feature/auth/screens/sign_in_screen.dart';
 ///
 /// When Amplify is on, avoid wrapping the whole shell in [AuthenticatedView]
 /// unless the product requires a hard login wall.
-final GoRouter appRouter = GoRouter(
-  initialLocation: '/',
-  routes: <RouteBase>[
-    // Public — no auth
-    GoRoute(
-      path: '/',
-      builder: (BuildContext context, GoRouterState state) {
-        return const OnboardingScreen();
-      },
-    ),
-    GoRoute(
-      path: '/sign-in',
-      builder: (BuildContext context, GoRouterState state) {
-        return const SignInScreen();
-      },
-    ),
+GoRouter createAppRouter({required bool onboardingComplete}) {
+  return GoRouter(
+    initialLocation: onboardingComplete ? '/home' : '/',
+    routes: <RouteBase>[
+      // Public — no auth
+      GoRoute(
+        path: '/',
+        builder: (BuildContext context, GoRouterState state) {
+          return const OnboardingScreen();
+        },
+      ),
+      GoRoute(
+        path: '/sign-in',
+        builder: (BuildContext context, GoRouterState state) {
+          return const SignInScreen();
+        },
+      ),
 
-    // Protected when using Amplify — wrap child in [AuthenticatedView].
-    GoRoute(
-      path: '/home',
-      builder: (BuildContext context, GoRouterState state) {
-        return const MainShell();
-        // return const AuthenticatedView(
-        //   child: MainShell(),
-        // );
-      },
-    ),
-  ],
-);
+      // Protected when using Amplify — wrap child in [AuthenticatedView].
+      GoRoute(
+        path: '/home',
+        builder: (BuildContext context, GoRouterState state) {
+          return const MainShell();
+          // return const AuthenticatedView(
+          //   child: MainShell(),
+          // );
+        },
+      ),
+    ],
+  );
+}

@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class KineticAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -58,7 +57,9 @@ class KineticAppBar extends StatelessWidget implements PreferredSizeWidget {
                         ),
                       )
                     else
-                      Icon(Icons.menu, color: cs.onSurface),
+                      // Side drawer — re-enable when navigation drawer is wired.
+                      // Icon(Icons.menu, color: cs.onSurface),
+                      const SizedBox(width: 24),
                     Flexible(
                       child: Text(
                         title,
@@ -75,21 +76,21 @@ class KineticAppBar extends StatelessWidget implements PreferredSizeWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         if (actions != null) ...actions!,
-                        if (showProfileButton)
-                          InkWell(
-                            onTap: onProfileTap ??
-                                () => context.push('/sign-in'),
-                            customBorder: const CircleBorder(),
-                            child: CircleAvatar(
-                              radius: 16,
-                              backgroundColor: cs.surfaceContainerHighest,
-                              child: Icon(
-                                Icons.person,
-                                size: 18,
-                                color: cs.onSurfaceVariant,
-                              ),
-                            ),
-                          ),
+                        // if (showProfileButton)
+                        //   InkWell(
+                        //     onTap: onProfileTap ??
+                        //         () => context.push('/sign-in'),
+                        //     customBorder: const CircleBorder(),
+                        //     child: CircleAvatar(
+                        //       radius: 16,
+                        //       backgroundColor: cs.surfaceContainerHighest,
+                        //       child: Icon(
+                        //         Icons.person,
+                        //         size: 18,
+                        //         color: cs.onSurfaceVariant,
+                        //       ),
+                        //     ),
+                        //   ),
                       ],
                     ),
                   ],

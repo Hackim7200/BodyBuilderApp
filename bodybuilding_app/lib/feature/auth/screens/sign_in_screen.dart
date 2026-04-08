@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:bodybuilding_app/feature/auth/data/onboarding_prefs.dart';
 
 /// Optional sign-in for sync (dummy UI for now). The app does not require
 /// login first — any non-empty email/password navigates to `/home`.
@@ -23,21 +26,26 @@ class _SignInScreenState extends State<SignInScreen> {
     super.dispose();
   }
 
-  void _back(BuildContext context) {
+  Future<void> _back(BuildContext context) async {
     if (context.canPop()) {
       context.pop();
+      return;
+    }
+    if (await OnboardingPrefs.isComplete()) {
+      if (context.mounted) context.go('/home');
     } else {
-      context.go('/');
+      if (context.mounted) context.go('/');
     }
   }
 
-  void _submit(BuildContext context) {
+  Future<void> _submit(BuildContext context) async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     FocusScope.of(context).unfocus();
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Dummy sign-in — no account was created.')),
     );
-    context.go('/home');
+    await OnboardingPrefs.setComplete();
+    if (context.mounted) context.go('/home');
   }
 
   @override
@@ -93,7 +101,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   controller: _passwordController,
                   obscureText: true,
                   textInputAction: TextInputAction.done,
-                  onFieldSubmitted: (_) => _submit(context),
+                  onFieldSubmitted: (_) => unawaited(_submit(context)),
                   autofillHints: const [AutofillHints.password],
                   decoration: const InputDecoration(
                     labelText: 'Password',
@@ -108,12 +116,12 @@ class _SignInScreenState extends State<SignInScreen> {
                 ),
                 const SizedBox(height: 24),
                 FilledButton(
-                  onPressed: () => _submit(context),
+                  onPressed: () => unawaited(_submit(context)),
                   child: const Text('Sign in'),
                 ),
                 const SizedBox(height: 8),
                 TextButton(
-                  onPressed: () => _back(context),
+                  onPressed: () => unawaited(_back(context)),
                   child: const Text('Back'),
                 ),
               ],

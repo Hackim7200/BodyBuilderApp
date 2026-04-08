@@ -18,8 +18,6 @@ class CircuitListCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final roundsLabel = circuit.rounds != null ? '${circuit.rounds}' : '—';
-    final stationLabel =
-        circuit.stationDurationSeconds != null ? '${circuit.stationDurationSeconds}s' : '—';
 
     return GestureDetector(
       onTap: onTap,
@@ -68,7 +66,6 @@ class CircuitListCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -97,29 +94,6 @@ class CircuitListCard extends StatelessWidget {
                   ],
                 ),
                 Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      'STATION',
-                      style: GoogleFonts.inter(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 2,
-                        color: cs.tertiary,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      stationLabel,
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: cs.primary,
-                      ),
-                    ),
-                  ],
-                ),
-                Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
@@ -134,8 +108,9 @@ class CircuitListCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       roundsLabel,
+                      textAlign: TextAlign.end,
                       style: GoogleFonts.inter(
-                        fontSize: 12,
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: cs.primary,
                       ),

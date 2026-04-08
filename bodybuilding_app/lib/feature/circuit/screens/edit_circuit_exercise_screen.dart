@@ -110,7 +110,7 @@ class _EditCircuitExerciseScreenState extends State<EditCircuitExerciseScreen> {
 
     return Scaffold(
       appBar: KineticAppBar(
-        title: 'EDIT STATION',
+        title: 'EDIT EXERCISE',
         showBackButton: true,
         actions: [
           GestureDetector(
@@ -141,7 +141,7 @@ class _EditCircuitExerciseScreenState extends State<EditCircuitExerciseScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            'STATION',
+            'EXERCISE',
             style: GoogleFonts.inter(
               fontSize: 28,
               fontWeight: FontWeight.w900,
@@ -164,7 +164,7 @@ class _EditCircuitExerciseScreenState extends State<EditCircuitExerciseScreen> {
           ],
           const SizedBox(height: 16),
           Text(
-            'Station duration applies to all exercises. Edit the circuit to change it.',
+            'Exercise duration applies to all exercises. Edit the circuit to change it.',
             style: GoogleFonts.inter(
               fontSize: 13,
               height: 1.4,

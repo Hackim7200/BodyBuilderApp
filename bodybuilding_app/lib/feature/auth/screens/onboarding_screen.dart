@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:bodybuilding_app/feature/auth/data/onboarding_prefs.dart';
 
 class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});
@@ -28,7 +29,7 @@ class OnboardingScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'Sign in to sync your routines, or explore without an account.',
+                'Create routines and track your workouts in minimalistic ways.',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.inter(
                   fontSize: 14,
@@ -38,14 +39,18 @@ class OnboardingScreen extends StatelessWidget {
               ),
               const SizedBox(height: 40),
               FilledButton(
-                onPressed: () => context.go('/home'),
+                onPressed: () async {
+                  await OnboardingPrefs.setComplete();
+                  if (context.mounted) context.go('/home');
+                },
                 child: const Text('Explore Now'),
               ),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: () => context.push('/sign-in'),
-                child: const Text('Sign In'),
-              ),
+              // Sign-in entry point — re-enable when cloud sync is wired.
+              // const SizedBox(height: 12),
+              // TextButton(
+              //   onPressed: () => context.push('/sign-in'),
+              //   child: const Text('Sign In'),
+              // ),
             ],
           ),
         ),

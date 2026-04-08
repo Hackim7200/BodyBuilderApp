@@ -36,6 +36,10 @@ type Circuit @model {
   description: String
   rounds: Int
   stationDurationSeconds: Int
+  # Countdown before the first station each session (seconds). Use 0 to skip.
+  preStartCountdownSeconds: Int
+  # Rest after each full lap when more rounds remain (seconds).
+  restBetweenRoundsSeconds: Int
   # When true, play shuffles station order once per session; when false/null, uses list order.
   randomizeStationOrder: Boolean
 }

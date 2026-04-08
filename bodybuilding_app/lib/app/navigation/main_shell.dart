@@ -2,8 +2,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:bodybuilding_app/feature/routine/routine_dashboard_screen.dart';
-import 'package:bodybuilding_app/feature/circuit/screens/circuit_dashboard_screen.dart';
-import 'package:bodybuilding_app/feature/stretch/screens/stretch_screen.dart';
+import 'package:bodybuilding_app/feature/circuit/circuit_dashboard_screen.dart';
+// import 'package:bodybuilding_app/feature/stretch/screens/stretch_screen.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -18,7 +18,7 @@ class _MainShellState extends State<MainShell> {
   final _screens = const [
     RoutineDashboardScreen(),
     CircuitDashboardScreen(),
-    StretchScreen(),
+    // StretchScreen(),
   ];
 
   @override
@@ -72,12 +72,12 @@ class _BottomNavBar extends StatelessWidget {
                     isActive: currentIndex == 1,
                     onTap: () => onTap(1),
                   ),
-                  _NavItem(
-                    icon: Icons.self_improvement,
-                    label: 'STRETCH',
-                    isActive: currentIndex == 2,
-                    onTap: () => onTap(2),
-                  ),
+                  // _NavItem(
+                  //   icon: Icons.self_improvement,
+                  //   label: 'STRETCH',
+                  //   isActive: currentIndex == 2,
+                  //   onTap: () => onTap(2),
+                  // ),
                 ],
               ),
             ),

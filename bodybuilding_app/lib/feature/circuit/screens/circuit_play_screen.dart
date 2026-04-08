@@ -9,7 +9,10 @@ import 'package:bodybuilding_app/core/widgets/kinetic_app_bar.dart';
 import 'package:bodybuilding_app/feature/circuit/data/circuit_exercise_service.dart';
 import 'package:bodybuilding_app/models/Circuit.dart';
 
-/// Runs a circuit: same station duration for each exercise, optional rounds.
+/// Runs a circuit: same station duration per exercise; [Circuit.rounds] defaults to 1 if unset.
+/// Get-ready countdown uses [Circuit.preStartCountdownSeconds] (default 10s
+/// when unset; 0 skips). Rest between rounds uses [Circuit.restBetweenRoundsSeconds]
+/// (default 30s when unset).
 class CircuitPlayScreen extends StatefulWidget {
   final Circuit circuit;
 
@@ -18,6 +21,8 @@ class CircuitPlayScreen extends StatefulWidget {
   @override
   State<CircuitPlayScreen> createState() => _CircuitPlayScreenState();
 }
+
+enum _CircuitPhase { preStart, work, roundRest }
 
 class _CircuitPlayScreenState extends State<CircuitPlayScreen> {
   final _linkService = CircuitExerciseService();
@@ -32,9 +37,23 @@ class _CircuitPlayScreenState extends State<CircuitPlayScreen> {
   bool _running = false;
   bool _finished = false;
   Timer? _timer;
+  _CircuitPhase _phase = _CircuitPhase.work;
+
+  /// After the last station of a round, [roundRest] runs before this round index starts.
+  int _pendingRoundAfterRest = 0;
 
   int get _stationSec =>
       widget.circuit.stationDurationSeconds?.clamp(1, 3600) ?? 30;
+
+  /// 0 = skip countdown and start the first station immediately.
+  int get _preStartCountdownSec {
+    final v = widget.circuit.preStartCountdownSeconds;
+    if (v == null) return 10;
+    return v.clamp(0, 300);
+  }
+
+  int get _restBetweenRoundsSec =>
+      widget.circuit.restBetweenRoundsSeconds?.clamp(1, 3600) ?? 30;
 
   int get _totalRounds => (widget.circuit.rounds ?? 1).clamp(1, 999);
 
@@ -101,7 +120,7 @@ class _CircuitPlayScreenState extends State<CircuitPlayScreen> {
         links.map((l) => l.exerciseId).toSet(),
       );
       final names = links
-          .map((l) => map[l.exerciseId]?.name.trim() ?? 'Station')
+          .map((l) => map[l.exerciseId]?.name.trim() ?? 'Exercise')
           .where((n) => n.isNotEmpty)
           .toList();
       final playOrder = List<String>.from(names);
@@ -109,19 +128,30 @@ class _CircuitPlayScreenState extends State<CircuitPlayScreen> {
         playOrder.shuffle(Random());
       }
       if (!mounted) return;
+      final preStart = _preStartCountdownSec;
       setState(() {
         _stationNames = playOrder;
         _loading = false;
-        _secondsLeft = _stationSec;
+        _roundIndex = 0;
+        _stationIndex = 0;
         _running = playOrder.isNotEmpty;
+        if (preStart <= 0) {
+          _phase = _CircuitPhase.work;
+          _secondsLeft = _stationSec;
+        } else {
+          _phase = _CircuitPhase.preStart;
+          _secondsLeft = preStart;
+        }
       });
       if (playOrder.isNotEmpty) {
         _startPeriodicTimer();
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!mounted) return;
-          HapticFeedback.mediumImpact();
-          unawaited(_playBeep(long: true));
-        });
+        if (preStart <= 0) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted) return;
+            HapticFeedback.mediumImpact();
+            unawaited(_playBeep(long: true));
+          });
+        }
       }
     } catch (e) {
       if (!mounted) return;
@@ -138,10 +168,52 @@ class _CircuitPlayScreenState extends State<CircuitPlayScreen> {
       setState(() => _secondsLeft--);
       return;
     }
-    _advanceStation();
+    _onSegmentComplete();
   }
 
-  void _advanceStation() {
+  void _onSegmentComplete() {
+    switch (_phase) {
+      case _CircuitPhase.preStart:
+        _enterFirstWorkSegment();
+        break;
+      case _CircuitPhase.roundRest:
+        _finishRoundRest();
+        break;
+      case _CircuitPhase.work:
+        _advanceFromWorkStation();
+        break;
+    }
+  }
+
+  void _enterFirstWorkSegment() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      HapticFeedback.mediumImpact();
+    });
+    unawaited(_playBeep(long: true));
+    setState(() {
+      _phase = _CircuitPhase.work;
+      _roundIndex = 0;
+      _stationIndex = 0;
+      _secondsLeft = _stationSec;
+    });
+  }
+
+  void _finishRoundRest() {
+    unawaited(_playBeep(long: true));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      HapticFeedback.mediumImpact();
+    });
+    setState(() {
+      _phase = _CircuitPhase.work;
+      _roundIndex = _pendingRoundAfterRest;
+      _stationIndex = 0;
+      _secondsLeft = _stationSec;
+    });
+  }
+
+  void _advanceFromWorkStation() {
     final n = _stationNames.length;
     if (n == 0) return;
 
@@ -161,12 +233,18 @@ class _CircuitPlayScreenState extends State<CircuitPlayScreen> {
         });
         return;
       }
+      unawaited(_playBeep());
+      setState(() {
+        _phase = _CircuitPhase.roundRest;
+        _secondsLeft = _restBetweenRoundsSec;
+        _pendingRoundAfterRest = nextRound;
+      });
+      return;
     }
 
     unawaited(_playBeep());
     setState(() {
       _stationIndex = nextStation;
-      _roundIndex = nextRound;
       _secondsLeft = _stationSec;
     });
   }
@@ -184,7 +262,38 @@ class _CircuitPlayScreenState extends State<CircuitPlayScreen> {
 
   void _skipStation() {
     if (_finished || _stationNames.isEmpty) return;
-    _advanceStation();
+    _onSegmentComplete();
+  }
+
+  String get _timerPhaseLabel {
+    switch (_phase) {
+      case _CircuitPhase.preStart:
+        return 'GET READY';
+      case _CircuitPhase.roundRest:
+      case _CircuitPhase.work:
+        return 'SECONDS';
+    }
+  }
+
+  String get _progressRoundLine {
+    if (_phase == _CircuitPhase.roundRest) {
+      return 'Start round ${_pendingRoundAfterRest + 1} after break';
+    }
+    return 'Round ${_roundIndex + 1} of $_totalRounds';
+  }
+
+  String get _progressExerciseLine =>
+      'Exercises ${_stationIndex + 1} of ${_stationNames.length}';
+
+  Color _countdownDigitColor(ColorScheme cs) {
+    switch (_phase) {
+      case _CircuitPhase.roundRest:
+        return Colors.amber.shade200;
+      case _CircuitPhase.preStart:
+        return Colors.lightGreen.shade300;
+      case _CircuitPhase.work:
+        return cs.primary;
+    }
   }
 
   @override
@@ -192,7 +301,9 @@ class _CircuitPlayScreenState extends State<CircuitPlayScreen> {
     final cs = Theme.of(context).colorScheme;
     final name = _stationNames.isEmpty
         ? '—'
-        : _stationNames[_stationIndex.clamp(0, _stationNames.length - 1)];
+        : _phase == _CircuitPhase.roundRest
+            ? 'Break'
+            : _stationNames[_stationIndex.clamp(0, _stationNames.length - 1)];
 
     return Scaffold(
       appBar: KineticAppBar(
@@ -252,13 +363,27 @@ class _CircuitPlayScreenState extends State<CircuitPlayScreen> {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          Text(
-                            'Round ${_roundIndex + 1} of $_totalRounds · '
-                            'Station ${_stationIndex + 1} of ${_stationNames.length}',
-                            style: GoogleFonts.inter(
-                              fontSize: 13,
-                              color: cs.tertiary,
-                            ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _progressRoundLine,
+                                style: GoogleFonts.inter(
+                                  fontSize: 13,
+                                  color: cs.tertiary,
+                                ),
+                              ),
+                              if (_phase != _CircuitPhase.roundRest) ...[
+                                const SizedBox(height: 2),
+                                Text(
+                                  _progressExerciseLine,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 13,
+                                    color: cs.tertiary,
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                           const Spacer(),
                           if (_finished) ...[
@@ -308,12 +433,12 @@ class _CircuitPlayScreenState extends State<CircuitPlayScreen> {
                                 fontSize: 96,
                                 fontWeight: FontWeight.w900,
                                 letterSpacing: -4,
-                                color: cs.primary,
+                                color: _countdownDigitColor(cs),
                                 height: 1,
                               ),
                             ),
                             Text(
-                              'SECONDS',
+                              _timerPhaseLabel,
                               textAlign: TextAlign.center,
                               style: GoogleFonts.inter(
                                 fontSize: 12,

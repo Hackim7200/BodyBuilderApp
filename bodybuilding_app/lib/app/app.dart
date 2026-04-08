@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:bodybuilding_app/app/navigation/app_router.dart';
+import 'package:go_router/go_router.dart';
 import 'package:bodybuilding_app/app/themes/app_theme.dart';
 
 // import 'package:amplify_authenticator/amplify_authenticator.dart';
 
 class OverloadTrackerApp extends StatelessWidget {
-  const OverloadTrackerApp({super.key});
+  const OverloadTrackerApp({super.key, required this.router});
+
+  final GoRouter router;
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +20,7 @@ class OverloadTrackerApp extends StatelessWidget {
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: ThemeMode.system,
-      routerConfig: appRouter,
+      routerConfig: router,
     );
     //   ),
     // );

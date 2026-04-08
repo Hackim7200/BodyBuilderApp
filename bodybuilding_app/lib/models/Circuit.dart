@@ -28,6 +28,8 @@ class Circuit extends amplify_core.Model {
   final String? _description;
   final int? _rounds;
   final int? _stationDurationSeconds;
+  final int? _preStartCountdownSeconds;
+  final int? _restBetweenRoundsSeconds;
   final bool? _randomizeStationOrder;
   final amplify_core.TemporalDateTime? _createdAt;
   final amplify_core.TemporalDateTime? _updatedAt;
@@ -64,6 +66,10 @@ class Circuit extends amplify_core.Model {
 
   int? get stationDurationSeconds => _stationDurationSeconds;
 
+  int? get preStartCountdownSeconds => _preStartCountdownSeconds;
+
+  int? get restBetweenRoundsSeconds => _restBetweenRoundsSeconds;
+
   bool? get randomizeStationOrder => _randomizeStationOrder;
 
   amplify_core.TemporalDateTime? get createdAt => _createdAt;
@@ -76,6 +82,8 @@ class Circuit extends amplify_core.Model {
     String? description,
     int? rounds,
     int? stationDurationSeconds,
+    int? preStartCountdownSeconds,
+    int? restBetweenRoundsSeconds,
     bool? randomizeStationOrder,
     amplify_core.TemporalDateTime? createdAt,
     amplify_core.TemporalDateTime? updatedAt,
@@ -83,6 +91,8 @@ class Circuit extends amplify_core.Model {
         _description = description,
         _rounds = rounds,
         _stationDurationSeconds = stationDurationSeconds,
+        _preStartCountdownSeconds = preStartCountdownSeconds,
+        _restBetweenRoundsSeconds = restBetweenRoundsSeconds,
         _randomizeStationOrder = randomizeStationOrder,
         _createdAt = createdAt,
         _updatedAt = updatedAt;
@@ -93,6 +103,8 @@ class Circuit extends amplify_core.Model {
     String? description,
     int? rounds,
     int? stationDurationSeconds,
+    int? preStartCountdownSeconds,
+    int? restBetweenRoundsSeconds,
     bool? randomizeStationOrder,
   }) {
     return Circuit._internal(
@@ -101,6 +113,8 @@ class Circuit extends amplify_core.Model {
       description: description,
       rounds: rounds,
       stationDurationSeconds: stationDurationSeconds,
+      preStartCountdownSeconds: preStartCountdownSeconds,
+      restBetweenRoundsSeconds: restBetweenRoundsSeconds,
       randomizeStationOrder: randomizeStationOrder,
     );
   }
@@ -114,6 +128,8 @@ class Circuit extends amplify_core.Model {
         _description == other._description &&
         _rounds == other._rounds &&
         _stationDurationSeconds == other._stationDurationSeconds &&
+        _preStartCountdownSeconds == other._preStartCountdownSeconds &&
+        _restBetweenRoundsSeconds == other._restBetweenRoundsSeconds &&
         _randomizeStationOrder == other._randomizeStationOrder;
   }
 
@@ -140,6 +156,20 @@ class Circuit extends amplify_core.Model {
           ', ',
     );
     buffer.write(
+      'preStartCountdownSeconds=' +
+          (_preStartCountdownSeconds != null
+              ? _preStartCountdownSeconds.toString()
+              : 'null') +
+          ', ',
+    );
+    buffer.write(
+      'restBetweenRoundsSeconds=' +
+          (_restBetweenRoundsSeconds != null
+              ? _restBetweenRoundsSeconds.toString()
+              : 'null') +
+          ', ',
+    );
+    buffer.write(
       'randomizeStationOrder=' +
           (_randomizeStationOrder != null
               ? _randomizeStationOrder.toString()
@@ -161,6 +191,8 @@ class Circuit extends amplify_core.Model {
     String? description,
     int? rounds,
     int? stationDurationSeconds,
+    int? preStartCountdownSeconds,
+    int? restBetweenRoundsSeconds,
     bool? randomizeStationOrder,
   }) {
     return Circuit._internal(
@@ -170,6 +202,10 @@ class Circuit extends amplify_core.Model {
       rounds: rounds ?? this.rounds,
       stationDurationSeconds:
           stationDurationSeconds ?? this.stationDurationSeconds,
+      preStartCountdownSeconds:
+          preStartCountdownSeconds ?? this.preStartCountdownSeconds,
+      restBetweenRoundsSeconds:
+          restBetweenRoundsSeconds ?? this.restBetweenRoundsSeconds,
       randomizeStationOrder:
           randomizeStationOrder ?? this.randomizeStationOrder,
     );
@@ -180,6 +216,8 @@ class Circuit extends amplify_core.Model {
     ModelFieldValue<String?>? description,
     ModelFieldValue<int?>? rounds,
     ModelFieldValue<int?>? stationDurationSeconds,
+    ModelFieldValue<int?>? preStartCountdownSeconds,
+    ModelFieldValue<int?>? restBetweenRoundsSeconds,
     ModelFieldValue<bool?>? randomizeStationOrder,
   }) {
     return Circuit._internal(
@@ -190,6 +228,12 @@ class Circuit extends amplify_core.Model {
       stationDurationSeconds: stationDurationSeconds == null
           ? this.stationDurationSeconds
           : stationDurationSeconds.value,
+      preStartCountdownSeconds: preStartCountdownSeconds == null
+          ? this.preStartCountdownSeconds
+          : preStartCountdownSeconds.value,
+      restBetweenRoundsSeconds: restBetweenRoundsSeconds == null
+          ? this.restBetweenRoundsSeconds
+          : restBetweenRoundsSeconds.value,
       randomizeStationOrder: randomizeStationOrder == null
           ? this.randomizeStationOrder
           : randomizeStationOrder.value,
@@ -203,6 +247,10 @@ class Circuit extends amplify_core.Model {
         _rounds = (json['rounds'] as num?)?.toInt(),
         _stationDurationSeconds =
             (json['stationDurationSeconds'] as num?)?.toInt(),
+        _preStartCountdownSeconds =
+            (json['preStartCountdownSeconds'] as num?)?.toInt(),
+        _restBetweenRoundsSeconds =
+            (json['restBetweenRoundsSeconds'] as num?)?.toInt(),
         _randomizeStationOrder = json['randomizeStationOrder'] as bool?,
         _createdAt = json['createdAt'] != null
             ? amplify_core.TemporalDateTime.fromString(json['createdAt'])
@@ -217,6 +265,8 @@ class Circuit extends amplify_core.Model {
         'description': _description,
         'rounds': _rounds,
         'stationDurationSeconds': _stationDurationSeconds,
+        'preStartCountdownSeconds': _preStartCountdownSeconds,
+        'restBetweenRoundsSeconds': _restBetweenRoundsSeconds,
         'randomizeStationOrder': _randomizeStationOrder,
         'createdAt': _createdAt?.format(),
         'updatedAt': _updatedAt?.format(),
@@ -228,6 +278,8 @@ class Circuit extends amplify_core.Model {
         'description': _description,
         'rounds': _rounds,
         'stationDurationSeconds': _stationDurationSeconds,
+        'preStartCountdownSeconds': _preStartCountdownSeconds,
+        'restBetweenRoundsSeconds': _restBetweenRoundsSeconds,
         'randomizeStationOrder': _randomizeStationOrder,
         'createdAt': _createdAt,
         'updatedAt': _updatedAt,
@@ -242,6 +294,10 @@ class Circuit extends amplify_core.Model {
   static final ROUNDS = amplify_core.QueryField(fieldName: 'rounds');
   static final STATIONDURATIONSECONDS =
       amplify_core.QueryField(fieldName: 'stationDurationSeconds');
+  static final PRESTARTCOUNTDOWNSECONDS =
+      amplify_core.QueryField(fieldName: 'preStartCountdownSeconds');
+  static final RESTBETWEENROUNDSSECONDS =
+      amplify_core.QueryField(fieldName: 'restBetweenRoundsSeconds');
   static final RANDOMIZESTATIONORDER =
       amplify_core.QueryField(fieldName: 'randomizeStationOrder');
   static var schema = amplify_core.Model.defineSchema(
@@ -271,6 +327,18 @@ class Circuit extends amplify_core.Model {
 
       modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
         key: Circuit.STATIONDURATIONSECONDS,
+        isRequired: false,
+        ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.int),
+      ));
+
+      modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
+        key: Circuit.PRESTARTCOUNTDOWNSECONDS,
+        isRequired: false,
+        ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.int),
+      ));
+
+      modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
+        key: Circuit.RESTBETWEENROUNDSSECONDS,
         isRequired: false,
         ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.int),
       ));

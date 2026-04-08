@@ -99,7 +99,7 @@ class _CreateRoutineScreenState extends State<CreateRoutineScreen> {
           _buildField('ROUTINE NAME', 'e.g. Push Day', _nameController),
           const SizedBox(height: 32),
           _buildField(
-            'DESCRIPTION',
+            'DESCRIPTION (OPTIONAL)',
             'e.g. Chest, Shoulders, Triceps',
             _descriptionController,
           ),

@@ -59,7 +59,7 @@ class _AddCircuitExerciseScreenState extends State<AddCircuitExerciseScreen> {
 
     return Scaffold(
       appBar: KineticAppBar(
-        title: 'NEW STATION',
+        title: 'NEW EXERCISE',
         showBackButton: true,
         actions: [
           GestureDetector(
@@ -113,7 +113,7 @@ class _AddCircuitExerciseScreenState extends State<AddCircuitExerciseScreen> {
           ],
           const SizedBox(height: 16),
           Text(
-            'Duration for every station is set on the circuit. Edit the circuit to change it.',
+            'Duration for every exercise is set on the circuit. Edit the circuit to change it.',
             style: GoogleFonts.inter(
               fontSize: 13,
               height: 1.4,

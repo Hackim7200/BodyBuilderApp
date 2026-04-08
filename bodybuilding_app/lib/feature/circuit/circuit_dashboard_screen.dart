@@ -5,7 +5,7 @@ import 'package:bodybuilding_app/core/widgets/empty_state_widget.dart';
 import 'package:bodybuilding_app/core/widgets/kinetic_app_bar.dart';
 import 'package:bodybuilding_app/feature/circuit/data/circuit_exercise_service.dart';
 import 'package:bodybuilding_app/feature/circuit/data/circuit_service.dart';
-import 'package:bodybuilding_app/feature/circuit/screens/circuit_detail_screen.dart';
+import 'package:bodybuilding_app/feature/circuit/circuit_detail_screen.dart';
 import 'package:bodybuilding_app/feature/circuit/screens/create_circuit_screen.dart';
 import 'package:bodybuilding_app/feature/circuit/widgets/circuit_list_card.dart';
 import 'package:bodybuilding_app/feature/circuit/widgets/create_circuit_card.dart';
@@ -60,7 +60,7 @@ class _CircuitDashboardScreenState extends State<CircuitDashboardScreen> {
               icon: Icons.loop,
               title: 'No circuits yet',
               subtitle:
-                  'Create a circuit and add timed stations from the detail screen.',
+                  'Create a circuit and add timed exercises from the detail screen.',
               actionLabel: 'Create circuit',
               onAction: _openCreate,
             );

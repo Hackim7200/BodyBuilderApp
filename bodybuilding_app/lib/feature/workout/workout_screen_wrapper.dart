@@ -118,7 +118,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
         ),
       );
     }
-    if (exercise.isStrength) {
+    if (exercise.isStrength || exercise.isTimer) {
       actions.add(
         IconButton(
           tooltip: 'Technique notes',
@@ -130,7 +130,6 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
 
     return Scaffold(
       appBar: KineticAppBar(
-        title: exercise.isTimer ? 'KINETIC ARCHIVE' : 'KINETIC',
         showBackButton: true,
         actions: actions.isEmpty ? null : actions,
       ),
@@ -142,7 +141,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
             child: Column(
               children: [
                 Text(
-                  exercise.isTimer ? 'CURRENT EXERCISE' : 'CURRENT SESSION',
+                  'CURRENT SESSION',
                   style: GoogleFonts.inter(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
@@ -154,7 +153,7 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
                 Text(
                   exercise.name.toUpperCase(),
                   style: GoogleFonts.inter(
-                    fontSize: exercise.isTimer ? 28 : 40,
+                    fontSize: 40,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -1.5,
                     height: 1.0,
@@ -174,7 +173,10 @@ class _ExerciseDetailScreenState extends State<ExerciseDetailScreen> {
               techniqueNotesRefreshToken: _techniqueNotesRefreshToken,
             )
           else
-            TimerExerciseDashboard(exercise: exercise),
+            TimerExerciseDashboard(
+              exercise: exercise,
+              techniqueNotesRefreshToken: _techniqueNotesRefreshToken,
+            ),
         ],
       ),
     );

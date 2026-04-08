@@ -23,6 +23,8 @@ class _EditCircuitScreenState extends State<EditCircuitScreen> {
   late final TextEditingController _descriptionController;
   late final TextEditingController _roundsController;
   late final TextEditingController _durationController;
+  late final TextEditingController _preStartCountdownController;
+  late final TextEditingController _restBetweenRoundsController;
   final _service = CircuitService();
   final _linkService = CircuitExerciseService();
   bool _saving = false;
@@ -41,6 +43,12 @@ class _EditCircuitScreenState extends State<EditCircuitScreen> {
     _durationController = TextEditingController(
       text: c.stationDurationSeconds?.toString() ?? '',
     );
+    _preStartCountdownController = TextEditingController(
+      text: c.preStartCountdownSeconds?.toString() ?? '10',
+    );
+    _restBetweenRoundsController = TextEditingController(
+      text: c.restBetweenRoundsSeconds?.toString() ?? '30',
+    );
     _randomizeStationOrder = c.randomizeStationOrder ?? false;
   }
 
@@ -50,6 +58,8 @@ class _EditCircuitScreenState extends State<EditCircuitScreen> {
     _descriptionController.dispose();
     _roundsController.dispose();
     _durationController.dispose();
+    _preStartCountdownController.dispose();
+    _restBetweenRoundsController.dispose();
     super.dispose();
   }
 
@@ -66,10 +76,14 @@ class _EditCircuitScreenState extends State<EditCircuitScreen> {
     if (name.isEmpty) return;
 
     final rounds = _parseOptionalPositiveInt(_roundsController.text);
-    if (_roundsController.text.trim().isNotEmpty && rounds == null) {
+    if (rounds == null) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Rounds must be a positive number.')),
+          const SnackBar(
+            content: Text(
+              'Rounds is required: enter a positive number.',
+            ),
+          ),
         );
       }
       return;
@@ -82,7 +96,40 @@ class _EditCircuitScreenState extends State<EditCircuitScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-              'Station duration is required: enter seconds between 1 and 3600.',
+              'Exercise duration is required: enter seconds between 1 and 3600.',
+            ),
+          ),
+        );
+      }
+      return;
+    }
+
+    final preStartRaw = _preStartCountdownController.text.trim();
+    final preStartSec = int.tryParse(preStartRaw);
+    if (preStartRaw.isEmpty ||
+        preStartSec == null ||
+        preStartSec < 0 ||
+        preStartSec > 300) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Starting countdown: enter 0–300 seconds (0 = skip, starts work immediately).',
+            ),
+          ),
+        );
+      }
+      return;
+    }
+
+    final restRaw = _restBetweenRoundsController.text.trim();
+    final restSec = int.tryParse(restRaw);
+    if (restRaw.isEmpty || restSec == null || restSec < 1 || restSec > 3600) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Rest between rounds is required: enter seconds between 1 and 3600.',
             ),
           ),
         );
@@ -100,6 +147,8 @@ class _EditCircuitScreenState extends State<EditCircuitScreen> {
         description: ModelFieldValue.value(desc.isEmpty ? null : desc),
         rounds: ModelFieldValue.value(rounds),
         stationDurationSeconds: ModelFieldValue.value(stationSec),
+        preStartCountdownSeconds: ModelFieldValue.value(preStartSec),
+        restBetweenRoundsSeconds: ModelFieldValue.value(restSec),
         randomizeStationOrder: ModelFieldValue.value(_randomizeStationOrder),
       );
       await _service.saveCircuit(updated);
@@ -205,13 +254,13 @@ class _EditCircuitScreenState extends State<EditCircuitScreen> {
           _buildField('CIRCUIT NAME', 'e.g. HIIT Blast', _nameController),
           const SizedBox(height: 32),
           _buildField(
-            'DESCRIPTION',
+            'DESCRIPTION (OPTIONAL)',
             'e.g. Metabolic conditioning',
             _descriptionController,
           ),
           const SizedBox(height: 32),
           _buildField(
-            'ROUNDS (OPTIONAL)',
+            'ROUNDS',
             'e.g. 3',
             _roundsController,
             keyboardType: TextInputType.number,
@@ -219,9 +268,25 @@ class _EditCircuitScreenState extends State<EditCircuitScreen> {
           ),
           const SizedBox(height: 32),
           _buildField(
-            'STATION DURATION (SECONDS)',
+            'EXERCISE DURATION (SECONDS)',
             'e.g. 45 — same for every exercise',
             _durationController,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          ),
+          const SizedBox(height: 32),
+          _buildField(
+            'STARTING COUNTDOWN (SECONDS)',
+            'e.g. 10 — before first exercise; use 0 to skip',
+            _preStartCountdownController,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          ),
+          const SizedBox(height: 32),
+          _buildField(
+            'REST BETWEEN ROUNDS (SECONDS)',
+            'e.g. 30 — after each full lap when more than one round',
+            _restBetweenRoundsController,
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           ),
@@ -305,7 +370,7 @@ class _EditCircuitScreenState extends State<EditCircuitScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'STATION ORDER',
+          'EXERCISE ORDER',
           style: GoogleFonts.inter(
             fontSize: 10,
             fontWeight: FontWeight.w700,
@@ -315,7 +380,7 @@ class _EditCircuitScreenState extends State<EditCircuitScreen> {
         ),
         const SizedBox(height: 8),
         Text(
-          'Sequential uses your list order. Random shuffles stations once each time you open Play.',
+          'Sequential uses your list order. Random shuffles exercises once each time you open Play.',
           style: GoogleFonts.inter(
             fontSize: 13,
             fontWeight: FontWeight.w400,
