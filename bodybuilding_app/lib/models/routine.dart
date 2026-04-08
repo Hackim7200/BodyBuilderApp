@@ -29,7 +29,6 @@ class Routine extends amplify_core.Model {
   final String id;
   final String? _name;
   final String? _description;
-  final String? _focus;
   final int? _estimatedDurationMinutes;
   final amplify_core.TemporalDateTime? _createdAt;
   final amplify_core.TemporalDateTime? _updatedAt;
@@ -64,10 +63,6 @@ class Routine extends amplify_core.Model {
     return _description;
   }
   
-  String? get focus {
-    return _focus;
-  }
-  
   int? get estimatedDurationMinutes {
     return _estimatedDurationMinutes;
   }
@@ -80,14 +75,13 @@ class Routine extends amplify_core.Model {
     return _updatedAt;
   }
   
-  const Routine._internal({required this.id, required name, description, focus, estimatedDurationMinutes, createdAt, updatedAt}): _name = name, _description = description, _focus = focus, _estimatedDurationMinutes = estimatedDurationMinutes, _createdAt = createdAt, _updatedAt = updatedAt;
+  const Routine._internal({required this.id, required name, description, estimatedDurationMinutes, createdAt, updatedAt}): _name = name, _description = description, _estimatedDurationMinutes = estimatedDurationMinutes, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory Routine({String? id, required String name, String? description, String? focus, int? estimatedDurationMinutes}) {
+  factory Routine({String? id, required String name, String? description, int? estimatedDurationMinutes}) {
     return Routine._internal(
       id: id == null ? amplify_core.UUID.getUUID() : id,
       name: name,
       description: description,
-      focus: focus,
       estimatedDurationMinutes: estimatedDurationMinutes);
   }
   
@@ -102,7 +96,6 @@ class Routine extends amplify_core.Model {
       id == other.id &&
       _name == other._name &&
       _description == other._description &&
-      _focus == other._focus &&
       _estimatedDurationMinutes == other._estimatedDurationMinutes;
   }
   
@@ -117,7 +110,6 @@ class Routine extends amplify_core.Model {
     buffer.write("id=" + "$id" + ", ");
     buffer.write("name=" + "$_name" + ", ");
     buffer.write("description=" + "$_description" + ", ");
-    buffer.write("focus=" + "$_focus" + ", ");
     buffer.write("estimatedDurationMinutes=" + (_estimatedDurationMinutes != null ? _estimatedDurationMinutes!.toString() : "null") + ", ");
     buffer.write("createdAt=" + (_createdAt != null ? _createdAt!.format() : "null") + ", ");
     buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt!.format() : "null"));
@@ -126,26 +118,23 @@ class Routine extends amplify_core.Model {
     return buffer.toString();
   }
   
-  Routine copyWith({String? name, String? description, String? focus, int? estimatedDurationMinutes}) {
+  Routine copyWith({String? name, String? description, int? estimatedDurationMinutes}) {
     return Routine._internal(
       id: id,
       name: name ?? this.name,
       description: description ?? this.description,
-      focus: focus ?? this.focus,
       estimatedDurationMinutes: estimatedDurationMinutes ?? this.estimatedDurationMinutes);
   }
   
   Routine copyWithModelFieldValues({
     ModelFieldValue<String>? name,
     ModelFieldValue<String?>? description,
-    ModelFieldValue<String?>? focus,
     ModelFieldValue<int?>? estimatedDurationMinutes
   }) {
     return Routine._internal(
       id: id,
       name: name == null ? this.name : name.value,
       description: description == null ? this.description : description.value,
-      focus: focus == null ? this.focus : focus.value,
       estimatedDurationMinutes: estimatedDurationMinutes == null ? this.estimatedDurationMinutes : estimatedDurationMinutes.value
     );
   }
@@ -154,20 +143,18 @@ class Routine extends amplify_core.Model {
     : id = json['id'],
       _name = json['name'],
       _description = json['description'],
-      _focus = json['focus'],
       _estimatedDurationMinutes = (json['estimatedDurationMinutes'] as num?)?.toInt(),
       _createdAt = json['createdAt'] != null ? amplify_core.TemporalDateTime.fromString(json['createdAt']) : null,
       _updatedAt = json['updatedAt'] != null ? amplify_core.TemporalDateTime.fromString(json['updatedAt']) : null;
   
   Map<String, dynamic> toJson() => {
-    'id': id, 'name': _name, 'description': _description, 'focus': _focus, 'estimatedDurationMinutes': _estimatedDurationMinutes, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+    'id': id, 'name': _name, 'description': _description, 'estimatedDurationMinutes': _estimatedDurationMinutes, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
   
   Map<String, Object?> toMap() => {
     'id': id,
     'name': _name,
     'description': _description,
-    'focus': _focus,
     'estimatedDurationMinutes': _estimatedDurationMinutes,
     'createdAt': _createdAt,
     'updatedAt': _updatedAt
@@ -177,7 +164,6 @@ class Routine extends amplify_core.Model {
   static final ID = amplify_core.QueryField(fieldName: "id");
   static final NAME = amplify_core.QueryField(fieldName: "name");
   static final DESCRIPTION = amplify_core.QueryField(fieldName: "description");
-  static final FOCUS = amplify_core.QueryField(fieldName: "focus");
   static final ESTIMATEDDURATIONMINUTES = amplify_core.QueryField(fieldName: "estimatedDurationMinutes");
   static var schema = amplify_core.Model.defineSchema(define: (amplify_core.ModelSchemaDefinition modelSchemaDefinition) {
     modelSchemaDefinition.name = "Routine";
@@ -193,12 +179,6 @@ class Routine extends amplify_core.Model {
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
       key: Routine.DESCRIPTION,
-      isRequired: false,
-      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
-    ));
-    
-    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
-      key: Routine.FOCUS,
       isRequired: false,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
     ));

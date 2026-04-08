@@ -132,6 +132,27 @@ class _WeightExerciseDashboardState extends State<WeightExerciseDashboard> {
     return v.toStringAsFixed(1);
   }
 
+  /// Header for [ProgressGraph]: saved % vs previous session, or derived from last two totals.
+  String get _trainingLoadChangeDisplay {
+    if (_historySessions.isEmpty) return '—';
+    final last = _historySessions.last;
+    final saved = last.trainingLoadChangePercent;
+    if (saved != null) {
+      final sign = saved > 0 ? '+' : '';
+      return '$sign${saved.toStringAsFixed(1)}';
+    }
+    if (_historySessions.length < 2) return '—';
+    final totals = _historySessions
+        .map((w) => totalTrainingLoadForSets(w.sets))
+        .toList();
+    final prev = totals[totals.length - 2];
+    final cur = totals[totals.length - 1];
+    final pct = SessionSetsService.trainingLoadChangePercentVsPrevious(cur, prev);
+    if (pct == null) return '—';
+    final sign = pct > 0 ? '+' : '';
+    return '$sign${pct.toStringAsFixed(1)}';
+  }
+
   Future<void> _loadPersistedSession(String routineExerciseId) async {
     try {
       final log = await _sessionSetsService.getOrCreateTodaysLog(
@@ -303,8 +324,8 @@ class _WeightExerciseDashboardState extends State<WeightExerciseDashboard> {
         ProgressGraph(
           title: 'PROGRESS',
           subtitle: '· last 7 workouts',
-          currentValue: _latestTrainingLoadDisplay,
-          unit: 'kg×reps',
+          currentValue: _trainingLoadChangeDisplay,
+          unit: '%',
           series: _trainingLoadSeries,
           xLabels: _trainingLoadLabels,
         ),
@@ -323,9 +344,9 @@ class _WeightExerciseDashboardState extends State<WeightExerciseDashboard> {
             const SizedBox(width: 24),
             Expanded(
               child: StatCard(
-                label: 'PERCENTAGE INCREASE',
-                value: '+5.2',
-                unit: '%',
+                label: 'TRAINING LOAD',
+                value: _latestTrainingLoadDisplay,
+                unit: 'kg×reps',
                 sublabel: 'Since Last Month',
               ),
             ),

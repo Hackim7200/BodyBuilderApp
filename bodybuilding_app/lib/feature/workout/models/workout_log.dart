@@ -95,6 +95,12 @@ class WorkoutLog {
   final List<TimerEntry> timerEntries;
   final double? estimatedOneRepMax;
 
+  /// Persisted Σ training load on DataStore [WorkoutLog.totalTrainingLoad] when the session is finished.
+  final double? totalTrainingLoad;
+
+  /// Persisted vs previous session; see [WorkoutLog.trainingLoadChangePercent] in schema.
+  final double? trainingLoadChangePercent;
+
   const WorkoutLog({
     required this.id,
     required this.exerciseId,
@@ -102,6 +108,8 @@ class WorkoutLog {
     this.sets = const [],
     this.timerEntries = const [],
     this.estimatedOneRepMax,
+    this.totalTrainingLoad,
+    this.trainingLoadChangePercent,
   });
 
   static List<WorkoutLog> get dummyBenchLogs => [

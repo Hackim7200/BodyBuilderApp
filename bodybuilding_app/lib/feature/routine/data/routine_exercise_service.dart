@@ -11,6 +11,32 @@ class RoutineExerciseService {
     return Amplify.DataStore.observeQuery(RoutineExercise.classType);
   }
 
+  /// All logs, for “last performed” per routine on the dashboard.
+  Stream<QuerySnapshot<WorkoutLog>> observeAllWorkoutLogs() {
+    return Amplify.DataStore.observeQuery(WorkoutLog.classType);
+  }
+
+  /// Latest [WorkoutLog.date] per [Routine.id], across all exercises in that routine.
+  static Map<String, DateTime> lastPerformedByRoutineId({
+    required List<RoutineExercise> links,
+    required List<WorkoutLog> logs,
+  }) {
+    if (links.isEmpty || logs.isEmpty) return {};
+    final linkIdToRoutineId = {for (final l in links) l.id: l.routineId};
+    final best = <String, DateTime>{};
+    for (final log in logs) {
+      final routineId = linkIdToRoutineId[log.routineExerciseId];
+      if (routineId == null) continue;
+      final at = log.date.getDateTimeInUtc();
+      best.update(
+        routineId,
+        (prev) => at.isAfter(prev) ? at : prev,
+        ifAbsent: () => at,
+      );
+    }
+    return best;
+  }
+
   static Map<String, int> exerciseCountsByRoutineId(
     List<RoutineExercise> links,
   ) {

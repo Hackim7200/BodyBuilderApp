@@ -7,7 +7,6 @@ type Routine @model {
   id: ID!
   name: String!
   description: String
-  focus: String
   estimatedDurationMinutes: Int
 }
 

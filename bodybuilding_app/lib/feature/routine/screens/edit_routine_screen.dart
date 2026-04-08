@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:bodybuilding_app/core/widgets/kinetic_app_bar.dart';
 import 'package:bodybuilding_app/feature/routine/data/routine_exercise_service.dart';
 import 'package:bodybuilding_app/feature/routine/data/routine_service.dart';
-import 'package:bodybuilding_app/feature/routine/widgets/routine_focus_selector.dart';
 import 'package:bodybuilding_app/models/RoutineExercise.dart';
 import 'package:bodybuilding_app/models/ModelProvider.dart' show ModelFieldValue;
 import 'package:bodybuilding_app/models/routine.dart';
@@ -21,7 +20,6 @@ class EditRoutineScreen extends StatefulWidget {
 class _EditRoutineScreenState extends State<EditRoutineScreen> {
   late final TextEditingController _nameController;
   late final TextEditingController _descriptionController;
-  late String? _selectedFocus;
   final _service = RoutineService();
   final _linkService = RoutineExerciseService();
   bool _saving = false;
@@ -33,7 +31,6 @@ class _EditRoutineScreenState extends State<EditRoutineScreen> {
     final r = widget.routine;
     _nameController = TextEditingController(text: r.name);
     _descriptionController = TextEditingController(text: r.description ?? '');
-    _selectedFocus = routineFocusValueFromStored(r.focus);
   }
 
   @override
@@ -55,7 +52,6 @@ class _EditRoutineScreenState extends State<EditRoutineScreen> {
       final updated = widget.routine.copyWithModelFieldValues(
         name: ModelFieldValue.value(name),
         description: ModelFieldValue.value(desc.isEmpty ? null : desc),
-        focus: ModelFieldValue.value(_selectedFocus),
       );
       await _service.saveRoutine(updated);
       if (mounted) Navigator.of(context).pop(updated);
@@ -163,11 +159,6 @@ class _EditRoutineScreenState extends State<EditRoutineScreen> {
             'DESCRIPTION',
             'e.g. Chest, Shoulders, Triceps',
             _descriptionController,
-          ),
-          const SizedBox(height: 32),
-          RoutineFocusSelector(
-            value: _selectedFocus,
-            onChanged: (v) => setState(() => _selectedFocus = v),
           ),
           const SizedBox(height: 32),
           _buildDerivedExerciseCount(cs),

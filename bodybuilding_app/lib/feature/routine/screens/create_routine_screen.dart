@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:bodybuilding_app/core/widgets/kinetic_app_bar.dart';
 import 'package:bodybuilding_app/feature/routine/data/routine_service.dart';
-import 'package:bodybuilding_app/feature/routine/widgets/routine_focus_selector.dart';
 import 'package:bodybuilding_app/models/routine.dart';
 
 class CreateRoutineScreen extends StatefulWidget {
@@ -16,7 +15,6 @@ class _CreateRoutineScreenState extends State<CreateRoutineScreen> {
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _service = RoutineService();
-  String? _selectedFocus;
   bool _saving = false;
 
   @override
@@ -37,7 +35,6 @@ class _CreateRoutineScreenState extends State<CreateRoutineScreen> {
       final routine = Routine(
         name: name,
         description: desc.isEmpty ? null : desc,
-        focus: _selectedFocus,
       );
       await _service.saveRoutine(routine);
       if (mounted) Navigator.of(context).pop();
@@ -105,11 +102,6 @@ class _CreateRoutineScreenState extends State<CreateRoutineScreen> {
             'DESCRIPTION',
             'e.g. Chest, Shoulders, Triceps',
             _descriptionController,
-          ),
-          const SizedBox(height: 32),
-          RoutineFocusSelector(
-            value: _selectedFocus,
-            onChanged: (v) => setState(() => _selectedFocus = v),
           ),
           const SizedBox(height: 32),
           _buildDerivedExerciseCount(cs),

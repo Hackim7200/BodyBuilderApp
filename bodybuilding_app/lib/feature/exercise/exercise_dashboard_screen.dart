@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:bodybuilding_app/core/widgets/kinetic_app_bar.dart';
 import 'package:bodybuilding_app/feature/routine/data/routine_exercise_service.dart';
+import 'package:bodybuilding_app/feature/routine/routine_last_session_format.dart';
 import 'package:bodybuilding_app/feature/exercise/models/exercise_ui_mapper.dart';
 import 'package:bodybuilding_app/feature/routine/screens/add_exercise_screen.dart';
 import 'package:bodybuilding_app/feature/routine/screens/edit_routine_screen.dart';
 import 'package:bodybuilding_app/feature/workout/workout_screen_wrapper.dart';
 import 'package:bodybuilding_app/models/Exercise.dart';
 import 'package:bodybuilding_app/models/RoutineExercise.dart';
+import 'package:bodybuilding_app/models/WorkoutLog.dart';
 import 'package:bodybuilding_app/models/routine.dart';
 
 /// Session vs session delta (%). Replace with real history when available.
@@ -222,22 +224,35 @@ class _HeroHeader extends StatelessWidget {
         const SizedBox(height: 16),
         StreamBuilder<QuerySnapshot<RoutineExercise>>(
           stream: linkService.observeForRoutine(routine.id),
-          builder: (context, snapshot) {
-            final n = snapshot.hasData ? snapshot.data!.items.length : 0;
-            return Row(
-              children: [
-                _MetricPill(label: 'EXERCISES', value: '$n'),
-                Container(
-                  width: 1,
-                  height: 32,
-                  margin: const EdgeInsets.symmetric(horizontal: 24),
-                  color: cs.surfaceContainerHighest,
-                ),
-                _MetricPill(
-                  label: 'FOCUS',
-                  value: (routine.focus ?? 'GENERAL').toUpperCase(),
-                ),
-              ],
+          builder: (context, linkSnap) {
+            final n = linkSnap.hasData ? linkSnap.data!.items.length : 0;
+            return StreamBuilder<QuerySnapshot<WorkoutLog>>(
+              stream: linkService.observeAllWorkoutLogs(),
+              builder: (context, logSnap) {
+                DateTime? last;
+                if (linkSnap.hasData && logSnap.hasData) {
+                  final map = RoutineExerciseService.lastPerformedByRoutineId(
+                    links: linkSnap.data!.items,
+                    logs: logSnap.data!.items,
+                  );
+                  last = map[routine.id];
+                }
+                return Row(
+                  children: [
+                    _MetricPill(label: 'EXERCISES', value: '$n'),
+                    Container(
+                      width: 1,
+                      height: 32,
+                      margin: const EdgeInsets.symmetric(horizontal: 24),
+                      color: cs.surfaceContainerHighest,
+                    ),
+                    _MetricPill(
+                      label: 'LAST SESSION',
+                      value: formatRoutineLastSessionLabel(last).toUpperCase(),
+                    ),
+                  ],
+                );
+              },
             );
           },
         ),

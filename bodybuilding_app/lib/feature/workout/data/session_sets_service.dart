@@ -75,7 +75,24 @@ class SessionSetsService {
     );
   }
 
-  /// Writes the session total (Σ per-set training load) on [WorkoutLog] when the workout is finished.
+  /// Sum of training load for a saved log: prefer stored [WorkoutLog.totalTrainingLoad], else Σ sets.
+  Future<double> _resolvedTotalTrainingLoadForLog(ds.WorkoutLog log) async {
+    final stored = log.totalTrainingLoad;
+    if (stored != null) return stored;
+    final sets = await loadSets(log.id);
+    return session.totalTrainingLoadForSets(sets);
+  }
+
+  /// Percent change vs chronologically previous session: `((current − previous) / previous) × 100`.
+  static double? trainingLoadChangePercentVsPrevious(
+    double currentTotal,
+    double? previousTotal,
+  ) {
+    if (previousTotal == null || previousTotal <= 0) return null;
+    return ((currentTotal - previousTotal) / previousTotal) * 100.0;
+  }
+
+  /// Writes Σ per-set training load and % change vs the previous [WorkoutLog] for this routine exercise.
   Future<void> saveWorkoutLogTotalTrainingLoad(
     String workoutLogId,
     List<session.SetEntry> sets,
@@ -86,9 +103,29 @@ class SessionSetsService {
       where: ds.WorkoutLog.ID.eq(workoutLogId),
     );
     if (rows.isEmpty) return;
-    await Amplify.DataStore.save(
-      rows.first.copyWith(totalTrainingLoad: total),
+    final current = rows.first;
+
+    final siblings = await Amplify.DataStore.query(
+      ds.WorkoutLog.classType,
+      where: ds.WorkoutLog.ROUTINEEXERCISEID.eq(current.routineExerciseId),
     );
+    siblings.sort((a, b) => a.date.compareTo(b.date));
+    final idx = siblings.indexWhere((l) => l.id == workoutLogId);
+
+    double? changePercent;
+    if (idx > 0) {
+      final previousTotal =
+          await _resolvedTotalTrainingLoadForLog(siblings[idx - 1]);
+      changePercent = trainingLoadChangePercentVsPrevious(total, previousTotal);
+    }
+
+    final updated = changePercent != null
+        ? current.copyWith(
+            totalTrainingLoad: total,
+            trainingLoadChangePercent: changePercent,
+          )
+        : current.copyWith(totalTrainingLoad: total);
+    await Amplify.DataStore.save(updated);
   }
 
   /// Creates or updates one set row; returns UI model with [SetEntry.datastoreId] set.
@@ -154,6 +191,8 @@ class SessionSetsService {
           exerciseId: routineExerciseId,
           date: log.date.getDateTimeInUtc().toLocal(),
           sets: sets,
+          totalTrainingLoad: log.totalTrainingLoad,
+          trainingLoadChangePercent: log.trainingLoadChangePercent,
         ),
       );
     }

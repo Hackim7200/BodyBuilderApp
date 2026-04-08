@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:bodybuilding_app/feature/routine/routine_last_session_format.dart';
 import 'package:bodybuilding_app/models/routine.dart';
 
 class RoutineCard extends StatelessWidget {
   final Routine routine;
   final int exerciseCount;
+  final DateTime? lastPerformed;
   final VoidCallback? onTap;
 
   const RoutineCard({
     super.key,
     required this.routine,
     required this.exerciseCount,
+    this.lastPerformed,
     this.onTap,
   });
 
@@ -64,7 +67,6 @@ class RoutineCard extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -96,7 +98,7 @@ class RoutineCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      'FOCUS',
+                      'LAST SESSION',
                       style: GoogleFonts.inter(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
@@ -106,9 +108,10 @@ class RoutineCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      (routine.focus ?? 'GENERAL').toUpperCase(),
+                      formatRoutineLastSessionLabel(lastPerformed),
+                      textAlign: TextAlign.end,
                       style: GoogleFonts.inter(
-                        fontSize: 12,
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: cs.primary,
                       ),

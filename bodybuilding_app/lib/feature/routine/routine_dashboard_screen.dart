@@ -6,6 +6,7 @@ import 'package:bodybuilding_app/core/widgets/kinetic_app_bar.dart';
 import 'package:bodybuilding_app/feature/routine/data/routine_exercise_service.dart';
 import 'package:bodybuilding_app/feature/routine/data/routine_service.dart';
 import 'package:bodybuilding_app/models/RoutineExercise.dart';
+import 'package:bodybuilding_app/models/WorkoutLog.dart';
 import 'package:bodybuilding_app/models/routine.dart';
 import 'package:bodybuilding_app/feature/routine/widgets/routine_card.dart';
 import 'package:bodybuilding_app/feature/routine/widgets/create_routine_card.dart';
@@ -66,62 +67,75 @@ class _RoutineDashboardScreenState extends State<RoutineDashboardScreen> {
           return StreamBuilder<QuerySnapshot<RoutineExercise>>(
             stream: _linkService.observeAllRoutineExerciseLinks(),
             builder: (context, linkSnap) {
-              final counts = linkSnap.hasData
-                  ? RoutineExerciseService.exerciseCountsByRoutineId(
-                      linkSnap.data!.items,
-                    )
-                  : <String, int>{};
+              return StreamBuilder<QuerySnapshot<WorkoutLog>>(
+                stream: _linkService.observeAllWorkoutLogs(),
+                builder: (context, logSnap) {
+                  final counts = linkSnap.hasData
+                      ? RoutineExerciseService.exerciseCountsByRoutineId(
+                          linkSnap.data!.items,
+                        )
+                      : <String, int>{};
+                  final lastPerformed =
+                      linkSnap.hasData && logSnap.hasData
+                          ? RoutineExerciseService.lastPerformedByRoutineId(
+                              links: linkSnap.data!.items,
+                              logs: logSnap.data!.items,
+                            )
+                          : <String, DateTime>{};
 
-              return ListView(
-                padding: const EdgeInsets.fromLTRB(24, 16, 24, 120),
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.end,
+                  return ListView(
+                    padding: const EdgeInsets.fromLTRB(24, 16, 24, 120),
                     children: [
-                      Text(
-                        'ACTIVE ROUTINES',
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 2,
-                          color: cs.primary,
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            'ACTIVE ROUTINES',
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 2,
+                              color: cs.primary,
+                            ),
+                          ),
+                          Text(
+                            '${routines.length} Total',
+                            style: GoogleFonts.inter(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w500,
+                              color: cs.tertiary,
+                            ),
+                          ),
+                        ],
                       ),
-                      Text(
-                        '${routines.length} Total',
-                        style: GoogleFonts.inter(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w500,
-                          color: cs.tertiary,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  ...routines.map(
-                    (routine) => Padding(
-                      padding: const EdgeInsets.only(bottom: 24),
-                      child: RoutineCard(
-                        routine: routine,
-                        exerciseCount: counts[routine.id] ?? 0,
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                RoutineDetailScreen(routine: routine),
+                      const SizedBox(height: 24),
+                      ...routines.map(
+                        (routine) => Padding(
+                          padding: const EdgeInsets.only(bottom: 24),
+                          child: RoutineCard(
+                            routine: routine,
+                            exerciseCount: counts[routine.id] ?? 0,
+                            lastPerformed: lastPerformed[routine.id],
+                            onTap: () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    RoutineDetailScreen(routine: routine),
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ),
-                  CreateRoutineCard(
-                    onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const CreateRoutineScreen(),
+                      CreateRoutineCard(
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const CreateRoutineScreen(),
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                ],
+                    ],
+                  );
+                },
               );
             },
           );
