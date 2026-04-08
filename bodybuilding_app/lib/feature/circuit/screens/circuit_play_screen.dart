@@ -455,6 +455,10 @@ class _CircuitPlayScreenState extends State<CircuitPlayScreen> {
                               children: [
                                 FilledButton.tonal(
                                   onPressed: _skipStation,
+                                  style: FilledButton.styleFrom(
+                                    backgroundColor: cs.primaryContainer,
+                                    foregroundColor: cs.onPrimaryContainer,
+                                  ),
                                   child: Text(
                                     'SKIP',
                                     style: GoogleFonts.inter(
