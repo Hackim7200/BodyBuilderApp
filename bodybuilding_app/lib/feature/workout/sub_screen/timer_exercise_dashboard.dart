@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:bodybuilding_app/app/themes/app_theme.dart';
+import 'package:bodybuilding_app/core/utils/timer_routine_target.dart';
 import 'package:bodybuilding_app/feature/exercise/models/exercise.dart';
 
 class TimerExerciseDashboard extends StatefulWidget {
@@ -115,6 +116,16 @@ class _TimerExerciseDashboardState extends State<TimerExerciseDashboard>
                         ),
                       ),
                     ],
+                    const SizedBox(height: 8),
+                    Text(
+                      'TARGET: ${TimerRoutineTarget.label(widget.exercise.timerTarget).toUpperCase()}',
+                      style: GoogleFonts.inter(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.2,
+                        color: cs.tertiary,
+                      ),
+                    ),
                   ],
                 ),
               ),

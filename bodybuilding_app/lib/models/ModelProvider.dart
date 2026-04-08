@@ -40,7 +40,7 @@ export 'WorkoutLog.dart';
 class ModelProvider implements amplify_core.ModelProviderInterface {
   /// Bump when any [modelSchemas] shape changes so local SQLite can migrate.
   @override
-  String version = "d8e2f1a0c4b3567890abcdef1234567890";
+  String version = "e9f3a2b1d5c467890abcdef1234567891";
   @override
   List<amplify_core.ModelSchema> modelSchemas = [
     Circuit.schema,

@@ -1,6 +1,7 @@
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:bodybuilding_app/core/utils/timer_routine_target.dart';
 import 'package:bodybuilding_app/core/widgets/kinetic_app_bar.dart';
 import 'package:bodybuilding_app/feature/routine/data/routine_exercise_service.dart';
 import 'package:bodybuilding_app/feature/routine/routine_last_session_format.dart';
@@ -84,10 +85,11 @@ String _subtitleLine(
   final isTimer = exercise?.type == 'timer';
 
   if (isTimer) {
+    final dir = TimerRoutineTarget.label(link.timerTarget);
     if (sets != null) {
-      return '$sets Sets | Timer';
+      return '$sets Sets | Timer · $dir';
     }
-    return '— Sets | Timer';
+    return '— Sets | Timer · $dir';
   }
 
   if (sets != null && reps != null && reps.isNotEmpty) {

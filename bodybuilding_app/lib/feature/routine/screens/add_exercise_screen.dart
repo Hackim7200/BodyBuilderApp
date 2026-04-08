@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:bodybuilding_app/core/utils/timer_routine_target.dart';
 import 'package:bodybuilding_app/core/utils/training_target_input.dart';
 import 'package:bodybuilding_app/core/widgets/kinetic_app_bar.dart';
 import 'package:bodybuilding_app/feature/routine/data/routine_exercise_service.dart';
@@ -26,6 +27,7 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
   final _repsController = TextEditingController();
   final _linkService = RoutineExerciseService();
   String _type = 'strength';
+  String _timerTarget = TimerRoutineTarget.increase;
   bool _saving = false;
 
   @override
@@ -76,6 +78,7 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
             : null,
         targetReps:
             _type == 'strength' ? _repsController.text.trim() : null,
+        timerTarget: _type == 'timer' ? _timerTarget : null,
       );
       if (mounted) Navigator.of(context).pop();
     } catch (e) {
@@ -188,6 +191,8 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
               keyboardType: TextInputType.number,
               inputFormatters: TrainingTargetInput.setsFieldFormatters,
             ),
+            const SizedBox(height: 32),
+            _buildTimerTargetSelector(cs),
           ],
           const SizedBox(height: 48),
           Container(
@@ -233,6 +238,47 @@ class _AddExerciseScreenState extends State<AddExerciseScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildTimerTargetSelector(ColorScheme cs) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'TARGET',
+          style: GoogleFonts.inter(
+            fontSize: 10,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 2,
+            color: cs.tertiary,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: _TypeOption(
+                label: 'Increase',
+                selected: _timerTarget == TimerRoutineTarget.increase,
+                onTap: () => setState(
+                  () => _timerTarget = TimerRoutineTarget.increase,
+                ),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: _TypeOption(
+                label: 'Decrease',
+                selected: _timerTarget == TimerRoutineTarget.decrease,
+                onTap: () => setState(
+                  () => _timerTarget = TimerRoutineTarget.decrease,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 

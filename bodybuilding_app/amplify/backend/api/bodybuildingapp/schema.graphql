@@ -26,6 +26,8 @@ type RoutineExercise @model {
   targetSets: Int
   targetReps: String
   restSeconds: Int
+  # Timer exercises only: "increase" or "decrease" (progress intent).
+  timerTarget: String
 }
 
 type Circuit @model {

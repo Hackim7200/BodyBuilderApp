@@ -66,5 +66,6 @@ Exercise exerciseForWorkoutDetail(
     reps: reps,
     restTime: restTime,
     routineExerciseId: link.id,
+    timerTarget: isTimer ? link.timerTarget : null,
   );
 }

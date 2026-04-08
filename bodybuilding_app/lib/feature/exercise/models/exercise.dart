@@ -1,3 +1,4 @@
+import 'package:bodybuilding_app/core/utils/timer_routine_target.dart';
 import 'package:bodybuilding_app/feature/workout/models/workout_log.dart';
 
 enum ExerciseType { strength, timer }
@@ -17,6 +18,9 @@ class Exercise {
   /// RoutineExercise id when opened from a routine; used to load prior session notes.
   final String? routineExerciseId;
 
+  /// [TimerRoutineTarget.increase] or [TimerRoutineTarget.decrease] when from a routine link.
+  final String? timerTarget;
+
   const Exercise({
     required this.id,
     required this.name,
@@ -30,6 +34,7 @@ class Exercise {
     this.progressLabel,
     this.logs = const [],
     this.routineExerciseId,
+    this.timerTarget,
   });
 
   bool get isStrength => type == ExerciseType.strength;
@@ -39,6 +44,10 @@ class Exercise {
     if (isStrength) {
       return '$sets Sets | $reps Reps';
     }
-    return '$sets Sets | Timer';
+    final dir = TimerRoutineTarget.label(timerTarget);
+    if (sets > 0) {
+      return '$sets Sets | Timer · $dir';
+    }
+    return '— Sets | Timer · $dir';
   }
 }

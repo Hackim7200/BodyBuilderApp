@@ -77,6 +77,7 @@ class RoutineExerciseService {
     int? targetSets,
     String? targetReps,
     int? restSeconds,
+    String? timerTarget,
   }) async {
     final links = await linksForRoutine(routineId);
     final nextOrder = links.isEmpty ? 0 : links.last.orderIndex + 1;
@@ -97,6 +98,7 @@ class RoutineExerciseService {
       targetSets: targetSets,
       targetReps: targetReps,
       restSeconds: restSeconds,
+      timerTarget: type == 'timer' ? timerTarget : null,
     );
     await Amplify.DataStore.save(link);
   }
@@ -113,6 +115,7 @@ class RoutineExerciseService {
     required String type,
     int? targetSets,
     String? targetReps,
+    String? timerTarget,
   }) async {
     final updatedExercise = exercise.copyWithModelFieldValues(
       name: ModelFieldValue.value(name.trim()),
@@ -126,9 +129,13 @@ class RoutineExerciseService {
         ? targetReps.trim()
         : null;
 
+    final timerTargetForStore =
+        type == 'timer' ? timerTarget : null;
+
     final updatedLink = link.copyWithModelFieldValues(
       targetSets: ModelFieldValue.value(targetSets),
       targetReps: ModelFieldValue.value(repsForStore),
+      timerTarget: ModelFieldValue.value(timerTargetForStore),
     );
     await Amplify.DataStore.save(updatedLink);
   }

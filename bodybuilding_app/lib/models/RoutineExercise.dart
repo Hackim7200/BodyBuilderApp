@@ -33,6 +33,7 @@ class RoutineExercise extends amplify_core.Model {
   final int? _targetSets;
   final String? _targetReps;
   final int? _restSeconds;
+  final String? _timerTarget;
   final amplify_core.TemporalDateTime? _createdAt;
   final amplify_core.TemporalDateTime? _updatedAt;
 
@@ -100,6 +101,10 @@ class RoutineExercise extends amplify_core.Model {
     return _restSeconds;
   }
   
+  String? get timerTarget {
+    return _timerTarget;
+  }
+  
   amplify_core.TemporalDateTime? get createdAt {
     return _createdAt;
   }
@@ -108,9 +113,9 @@ class RoutineExercise extends amplify_core.Model {
     return _updatedAt;
   }
   
-  const RoutineExercise._internal({required this.id, required routineId, required exerciseId, required orderIndex, targetSets, targetReps, restSeconds, createdAt, updatedAt}): _routineId = routineId, _exerciseId = exerciseId, _orderIndex = orderIndex, _targetSets = targetSets, _targetReps = targetReps, _restSeconds = restSeconds, _createdAt = createdAt, _updatedAt = updatedAt;
+  const RoutineExercise._internal({required this.id, required routineId, required exerciseId, required orderIndex, targetSets, targetReps, restSeconds, timerTarget, createdAt, updatedAt}): _routineId = routineId, _exerciseId = exerciseId, _orderIndex = orderIndex, _targetSets = targetSets, _targetReps = targetReps, _restSeconds = restSeconds, _timerTarget = timerTarget, _createdAt = createdAt, _updatedAt = updatedAt;
   
-  factory RoutineExercise({String? id, required String routineId, required String exerciseId, required int orderIndex, int? targetSets, String? targetReps, int? restSeconds}) {
+  factory RoutineExercise({String? id, required String routineId, required String exerciseId, required int orderIndex, int? targetSets, String? targetReps, int? restSeconds, String? timerTarget}) {
     return RoutineExercise._internal(
       id: id == null ? amplify_core.UUID.getUUID() : id,
       routineId: routineId,
@@ -118,7 +123,8 @@ class RoutineExercise extends amplify_core.Model {
       orderIndex: orderIndex,
       targetSets: targetSets,
       targetReps: targetReps,
-      restSeconds: restSeconds);
+      restSeconds: restSeconds,
+      timerTarget: timerTarget);
   }
   
   bool equals(Object other) {
@@ -135,7 +141,8 @@ class RoutineExercise extends amplify_core.Model {
       _orderIndex == other._orderIndex &&
       _targetSets == other._targetSets &&
       _targetReps == other._targetReps &&
-      _restSeconds == other._restSeconds;
+      _restSeconds == other._restSeconds &&
+      _timerTarget == other._timerTarget;
   }
   
   @override
@@ -153,6 +160,7 @@ class RoutineExercise extends amplify_core.Model {
     buffer.write("targetSets=" + (_targetSets != null ? _targetSets!.toString() : "null") + ", ");
     buffer.write("targetReps=" + "$_targetReps" + ", ");
     buffer.write("restSeconds=" + (_restSeconds != null ? _restSeconds!.toString() : "null") + ", ");
+    buffer.write("timerTarget=" + "$_timerTarget" + ", ");
     buffer.write("createdAt=" + (_createdAt != null ? _createdAt!.format() : "null") + ", ");
     buffer.write("updatedAt=" + (_updatedAt != null ? _updatedAt!.format() : "null"));
     buffer.write("}");
@@ -160,7 +168,7 @@ class RoutineExercise extends amplify_core.Model {
     return buffer.toString();
   }
   
-  RoutineExercise copyWith({String? routineId, String? exerciseId, int? orderIndex, int? targetSets, String? targetReps, int? restSeconds}) {
+  RoutineExercise copyWith({String? routineId, String? exerciseId, int? orderIndex, int? targetSets, String? targetReps, int? restSeconds, String? timerTarget}) {
     return RoutineExercise._internal(
       id: id,
       routineId: routineId ?? this.routineId,
@@ -168,7 +176,8 @@ class RoutineExercise extends amplify_core.Model {
       orderIndex: orderIndex ?? this.orderIndex,
       targetSets: targetSets ?? this.targetSets,
       targetReps: targetReps ?? this.targetReps,
-      restSeconds: restSeconds ?? this.restSeconds);
+      restSeconds: restSeconds ?? this.restSeconds,
+      timerTarget: timerTarget ?? this.timerTarget);
   }
   
   RoutineExercise copyWithModelFieldValues({
@@ -177,7 +186,8 @@ class RoutineExercise extends amplify_core.Model {
     ModelFieldValue<int>? orderIndex,
     ModelFieldValue<int?>? targetSets,
     ModelFieldValue<String?>? targetReps,
-    ModelFieldValue<int?>? restSeconds
+    ModelFieldValue<int?>? restSeconds,
+    ModelFieldValue<String?>? timerTarget,
   }) {
     return RoutineExercise._internal(
       id: id,
@@ -186,7 +196,8 @@ class RoutineExercise extends amplify_core.Model {
       orderIndex: orderIndex == null ? this.orderIndex : orderIndex.value,
       targetSets: targetSets == null ? this.targetSets : targetSets.value,
       targetReps: targetReps == null ? this.targetReps : targetReps.value,
-      restSeconds: restSeconds == null ? this.restSeconds : restSeconds.value
+      restSeconds: restSeconds == null ? this.restSeconds : restSeconds.value,
+      timerTarget: timerTarget == null ? this.timerTarget : timerTarget.value,
     );
   }
   
@@ -198,11 +209,12 @@ class RoutineExercise extends amplify_core.Model {
       _targetSets = (json['targetSets'] as num?)?.toInt(),
       _targetReps = json['targetReps'],
       _restSeconds = (json['restSeconds'] as num?)?.toInt(),
+      _timerTarget = json['timerTarget'],
       _createdAt = json['createdAt'] != null ? amplify_core.TemporalDateTime.fromString(json['createdAt']) : null,
       _updatedAt = json['updatedAt'] != null ? amplify_core.TemporalDateTime.fromString(json['updatedAt']) : null;
   
   Map<String, dynamic> toJson() => {
-    'id': id, 'routineId': _routineId, 'exerciseId': _exerciseId, 'orderIndex': _orderIndex, 'targetSets': _targetSets, 'targetReps': _targetReps, 'restSeconds': _restSeconds, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
+    'id': id, 'routineId': _routineId, 'exerciseId': _exerciseId, 'orderIndex': _orderIndex, 'targetSets': _targetSets, 'targetReps': _targetReps, 'restSeconds': _restSeconds, 'timerTarget': _timerTarget, 'createdAt': _createdAt?.format(), 'updatedAt': _updatedAt?.format()
   };
   
   Map<String, Object?> toMap() => {
@@ -213,6 +225,7 @@ class RoutineExercise extends amplify_core.Model {
     'targetSets': _targetSets,
     'targetReps': _targetReps,
     'restSeconds': _restSeconds,
+    'timerTarget': _timerTarget,
     'createdAt': _createdAt,
     'updatedAt': _updatedAt
   };
@@ -225,6 +238,7 @@ class RoutineExercise extends amplify_core.Model {
   static final TARGETSETS = amplify_core.QueryField(fieldName: "targetSets");
   static final TARGETREPS = amplify_core.QueryField(fieldName: "targetReps");
   static final RESTSECONDS = amplify_core.QueryField(fieldName: "restSeconds");
+  static final TIMERTARGET = amplify_core.QueryField(fieldName: "timerTarget");
   static var schema = amplify_core.Model.defineSchema(define: (amplify_core.ModelSchemaDefinition modelSchemaDefinition) {
     modelSchemaDefinition.name = "RoutineExercise";
     modelSchemaDefinition.pluralName = "RoutineExercises";
@@ -265,6 +279,12 @@ class RoutineExercise extends amplify_core.Model {
       key: RoutineExercise.RESTSECONDS,
       isRequired: false,
       ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.int)
+    ));
+    
+    modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.field(
+      key: RoutineExercise.TIMERTARGET,
+      isRequired: false,
+      ofType: amplify_core.ModelFieldType(amplify_core.ModelFieldTypeEnum.string)
     ));
     
     modelSchemaDefinition.addField(amplify_core.ModelFieldDefinition.nonQueryField(
