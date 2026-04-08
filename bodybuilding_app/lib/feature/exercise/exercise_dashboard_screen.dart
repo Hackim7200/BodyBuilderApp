@@ -7,24 +7,12 @@ import 'package:bodybuilding_app/feature/routine/routine_last_session_format.dar
 import 'package:bodybuilding_app/feature/exercise/models/exercise_ui_mapper.dart';
 import 'package:bodybuilding_app/feature/routine/screens/add_exercise_screen.dart';
 import 'package:bodybuilding_app/feature/routine/screens/edit_routine_screen.dart';
+import 'package:bodybuilding_app/feature/workout/data/session_sets_service.dart';
 import 'package:bodybuilding_app/feature/workout/workout_screen_wrapper.dart';
 import 'package:bodybuilding_app/models/Exercise.dart';
 import 'package:bodybuilding_app/models/RoutineExercise.dart';
 import 'package:bodybuilding_app/models/WorkoutLog.dart';
 import 'package:bodybuilding_app/models/routine.dart';
-
-/// Session vs session delta (%). Replace with real history when available.
-/// Repeats by row: increase, decrease, stable, then repeat.
-double _placeholderDeltaPercent(int listIndex) {
-  switch (listIndex % 3) {
-    case 0:
-      return 2.5;
-    case 1:
-      return -3.0;
-    default:
-      return 0;
-  }
-}
 
 class _ExerciseProgressStyle {
   final Color dotColor;
@@ -357,19 +345,33 @@ class _ExerciseList extends StatelessWidget {
                     );
                   }
                   final map = exSnap.data!;
-                  return Column(
-                    children: [
-                      for (var i = 0; i < links.length; i++)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
-                          child: _ExerciseTile(
-                            exercise: map[links[i].exerciseId],
-                            link: links[i],
-                            listIndex: i,
-                            routineName: routineName,
-                          ),
-                        ),
-                    ],
+                  return StreamBuilder<QuerySnapshot<WorkoutLog>>(
+                    stream: linkService.observeAllWorkoutLogs(),
+                    builder: (context, logSnap) {
+                      final logs = logSnap.data?.items ?? const <WorkoutLog>[];
+                      return Column(
+                        children: [
+                          for (var i = 0; i < links.length; i++)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 16),
+                              child: _ExerciseTile(
+                                exercise: map[links[i].exerciseId],
+                                link: links[i],
+                                listIndex: i,
+                                routineName: routineName,
+                                trainingLoadChangePercent:
+                                    map[links[i].exerciseId]?.type != 'timer'
+                                        ? SessionSetsService
+                                            .trainingLoadChangePercentForLatestSession(
+                                              links[i].id,
+                                              logs,
+                                            )
+                                        : null,
+                              ),
+                            ),
+                        ],
+                      );
+                    },
                   );
                 },
               ),
@@ -386,21 +388,24 @@ class _ExerciseTile extends StatelessWidget {
   final RoutineExercise link;
   final int listIndex;
   final String routineName;
+  final double? trainingLoadChangePercent;
 
   const _ExerciseTile({
     required this.exercise,
     required this.link,
     required this.listIndex,
     required this.routineName,
+    this.trainingLoadChangePercent,
   });
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
     final name = exercise?.name ?? 'Unknown exercise';
-    final delta = _placeholderDeltaPercent(listIndex);
-    final progress = _progressFromDeltaPercent(delta, cs.outline);
+    final delta = trainingLoadChangePercent;
     final subtitle = _subtitleLine(link, listIndex, exercise);
+    final progress =
+        delta != null ? _progressFromDeltaPercent(delta, cs.outline) : null;
 
     return Material(
       color: cs.surfaceContainerLowest,
@@ -454,44 +459,46 @@ class _ExerciseTile extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: progress.dotColor,
-                          shape: BoxShape.circle,
+              if (progress != null) ...[
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: progress.dotColor,
+                            shape: BoxShape.circle,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        progress.valueLabel,
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: progress.valueColor,
+                        const SizedBox(width: 8),
+                        Text(
+                          progress.valueLabel,
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: progress.valueColor,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    progress.caption,
-                    style: GoogleFonts.inter(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: 0.5,
-                      color: progress.captionColor,
+                      ],
                     ),
-                  ),
-                ],
-              ),
+                    const SizedBox(height: 4),
+                    Text(
+                      progress.caption,
+                      style: GoogleFonts.inter(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0.5,
+                        color: progress.captionColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ],
           ),
         ),

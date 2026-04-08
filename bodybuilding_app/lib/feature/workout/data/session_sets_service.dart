@@ -92,6 +92,35 @@ class SessionSetsService {
     return ((currentTotal - previousTotal) / previousTotal) * 100.0;
   }
 
+  /// Strength volume change for the most recent session that has data, vs the
+  /// session before it. Uses persisted [WorkoutLog.trainingLoadChangePercent]
+  /// when set; otherwise derives from consecutive [WorkoutLog.totalTrainingLoad]
+  /// values. Skips a newest log with no totals (e.g. in-progress day).
+  static double? trainingLoadChangePercentForLatestSession(
+    String routineExerciseId,
+    List<ds.WorkoutLog> allLogs,
+  ) {
+    final ordered = allLogs
+        .where((l) => l.routineExerciseId == routineExerciseId)
+        .toList()
+      ..sort((a, b) => b.date.compareTo(a.date));
+
+    for (var i = 0; i < ordered.length; i++) {
+      final log = ordered[i];
+      final saved = log.trainingLoadChangePercent;
+      if (saved != null) return saved;
+
+      if (i + 1 < ordered.length) {
+        final cur = log.totalTrainingLoad;
+        final prev = ordered[i + 1].totalTrainingLoad;
+        if (cur != null && prev != null && prev > 0) {
+          return trainingLoadChangePercentVsPrevious(cur, prev);
+        }
+      }
+    }
+    return null;
+  }
+
   /// Writes Σ per-set training load and % change vs the previous [WorkoutLog] for this routine exercise.
   Future<void> saveWorkoutLogTotalTrainingLoad(
     String workoutLogId,
